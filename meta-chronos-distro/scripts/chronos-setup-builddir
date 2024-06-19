@@ -1,0 +1,18 @@
+#!/bin/sh
+
+if [ -z "$CHRONOSROOT" ]; then
+    echo >&2 "Error: CHRONOSROOT is not defined!"
+    return 1
+fi
+
+if [ -z "$OEROOT" ]; then
+    OEROOT="$CHRONOSROOT/../poky"
+    OEROOT=$(realpath "$OEROOT")
+fi
+
+export OEROOT
+. "$OEROOT"/scripts/oe-setup-builddir || {
+    unset OEROOT
+    return 1
+}
+unset OEROOT

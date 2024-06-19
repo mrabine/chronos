@@ -1,0 +1,28 @@
+#!/sbin/runiscript
+# SERVICE: daemon/dropbear
+# NAME: dropbear
+# DESCRIPTION:
+
+RUN_PATH="/run"
+PID_FILE="${RUN_PATH}/dropbear.pid"
+
+KEY_PATH="/etc/dropbear"
+ECDSA_HOST_KEY="${KEY_PATH}/ecdsa_host_key"
+
+setup() {
+    iregister daemon
+        iset need = system/essentials virtual/net
+        iset require = service/genkey
+        iset pid_file = ${PID_FILE}
+        iset daemon_stops_badly
+        iset respawn_pause = 1
+        iset respawn_rate = 0
+        iset respawn
+        iexec daemon
+    idone
+}
+
+daemon() {
+    mkdir -m 0755 -p ${RUN_PATH}
+    exec dropbear -F -j -k -r ${ECDSA_HOST_KEY}
+}

@@ -1,0 +1,29 @@
+Index: git/src/modules/ngc4/libngcclient.c
+===================================================================
+--- git.orig/src/modules/ngc4/libngcclient.c
++++ git/src/modules/ngc4/libngcclient.c
+@@ -112,6 +112,7 @@ reply *ngcclient_send_command(const char
+ 	read_header header;
+ 	reply *rep;
+ 	int sock = -1;
++	int trials = 0;
+ 
+ 	/* clear structure just in case */
+ 	memset(&header, 0, sizeof(read_header));
+@@ -134,7 +135,15 @@ reply *ngcclient_send_command(const char
+ 	/*print_out("Sending: %c, %s, %s\n", c, l ,o); */
+ 
+ 	/* open the socket two way to initng */
+-	sock = ngcclient_open_socket(path);
++	for (;;) {
++		sock = ngcclient_open_socket (path);
++		if (sock || ++trials > 1)
++			break;
++		/* Send SIGHUP signal to initng to recreate CTLDIR */
++		kill (1, SIGHUP);
++		usleep (50000);
++	}
++
+ 	if (sock < 1) {
+ 		/*
+ 		 * Set in ngcclient_open_socket()

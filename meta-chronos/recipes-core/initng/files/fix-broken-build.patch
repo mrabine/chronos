@@ -1,0 +1,435 @@
+Index: git/configure.acr
+===================================================================
+--- git.orig/configure.acr
++++ git/configure.acr
+@@ -44,6 +44,7 @@ IF WITH_SELINUX {
+ 	}
+ }
+ 
++USE_PKGCONFIG
+ PKGCONFIG DBUS_CFLAGS DBUS_LDFLAGS dbus-1
+ 
+ 
+Index: git/Jamrules
+===================================================================
+--- git.orig/Jamrules
++++ git/Jamrules
+@@ -212,7 +212,7 @@ rule InstallLink
+    TARGET on $(1) = $(3) ;
+    DIR on $(1) = $(2) ;
+    Depends install : $(1) ;
+-
++   Depends $(3) : $(1) ;
+    InstallLink1 $(1) ;
+ }
+ 
+Index: git/include/Jamfile
+===================================================================
+--- git.orig/include/Jamfile
++++ git/include/Jamfile
+@@ -5,3 +5,11 @@ SubInclude TOP include initng ;
+ 
+ # Install
+ InstallFile $(DESTDIR)$(includedir) : initng.h ;
++
++# Install signal.h header files from this directory because from the
++# subdirectory there are problems with same target names 'signal.h'
++InstallSubdirFile $(DESTDIR)$(includedir) : initng : signal.h ;
++
++# same for string.h
++# subdirectory there are problems with same target names 'string.h'
++InstallSubdirFile $(DESTDIR)$(includedir) : initng : string.h ;
+Index: git/include/initng/Jamfile
+===================================================================
+--- git.orig/include/initng/Jamfile
++++ git/include/initng/Jamfile
+@@ -24,8 +24,6 @@ InstallFile $(DESTDIR)$(includedir)/init
+ 	io.h
+ 	module_callers.h
+ 	process_db.h
+-	signal.h
+-	string.h
+ 	data.h
+ 	toolbox.h
+ 	msg.h ;
+Index: git/src/main/active_db/count.c
+===================================================================
+--- git.orig/src/main/active_db/count.c
++++ git/src/main/active_db/count.c
+@@ -53,6 +53,8 @@ int initng_active_db_count(a_state_h * s
+ 			case IS_FAILED:
+ 			case IS_DOWN:
+ 				continue;
++			default:
++				break;
+ 			}
+ 
+ 			counter++;
+Index: git/src/main/depend/any_depends_on.c
+===================================================================
+--- git.orig/src/main/depend/any_depends_on.c
++++ git/src/main/depend/any_depends_on.c
+@@ -49,6 +49,9 @@ int initng_depend_any_depends_on(active_
+ 				   service->name);
+ 				return TRUE;
+ 			}
++			break;
++		default:
++			break;
+ 		}
+ 	}
+ 
+Index: git/src/main/depend/stop_dep_met.c
+===================================================================
+--- git.orig/src/main/depend/stop_dep_met.c
++++ git/src/main/depend/stop_dep_met.c
+@@ -79,6 +79,9 @@ int initng_depend_stop_dep_met(active_db
+ 				   "WAITING_FOR_START_DEP"))
+ 				continue;
+ 			break;
++
++		default:
++			break;
+ 		}
+ 
+ #ifdef DEBUG
+Index: git/src/main/error/print.c
+===================================================================
+--- git.orig/src/main/error/print.c
++++ git/src/main/error/print.c
+@@ -196,8 +196,7 @@ void initng_error_print_func(const char
+ 	if (g.verbose == 2 || g.verbose == 3) {
+ 		for (i = 0; i < MAX_VERBOSES; i++) {
+ 			if (g.verbose_this[i]) {
+-				if (g.verbose_this[i][0] == '%' &&
+-				    g.verbose_this[i] + 1) {
++				if (g.verbose_this[i][0] == '%') {
+ 					if (strstr(file,
+ 						(g.verbose_this[i]) + 1)
+ 					    || strstr(func,
+@@ -251,8 +250,7 @@ int initng_error_print_debug(const char
+ 	if (g.verbose == 2 || g.verbose == 3)
+ 		for (i = 0; i < MAX_VERBOSES; i++)
+ 			if (g.verbose_this[i]) {
+-				if (g.verbose_this[i][0] == '%' &&
+-				    (g.verbose_this[i] + 1)) {
++				if (g.verbose_this[i][0] == '%') {
+ 					if (strstr(file,
+ 						       (g.verbose_this[i]) + 1)
+ 					    || strstr(func,
+Index: git/src/main/handler/stop_all.c
+===================================================================
+--- git.orig/src/main/handler/stop_all.c
++++ git/src/main/handler/stop_all.c
+@@ -45,6 +45,8 @@ int initng_handler_stop_all(void)
+ 		case IS_DOWN:
+ 		case IS_FAILED:
+ 			continue;
++		default:
++			break;
+ 		}
+ 
+ 		/* stop services */
+Index: git/src/main/interrupt/handle.c
+===================================================================
+--- git.orig/src/main/interrupt/handle.c
++++ git/src/main/interrupt/handle.c
+@@ -81,6 +81,10 @@ void handle(active_db_h * service)
+ 		case IS_DOWN:
+ 			if (is(&RESTARTING, service))
+ 				initng_handler_restart_restarting();
++			break;
++
++		default:
++			break;
+ 		}
+ 		/* this will make all services, that depend of this to stop,
+ 		 * DEP_FAILED_TO_STOP */
+Index: git/src/main/main/ready_to_quit.c
+===================================================================
+--- git.orig/src/main/main/ready_to_quit.c
++++ git/src/main/main/ready_to_quit.c
+@@ -43,6 +43,8 @@ int initng_main_ready_to_quit(void)
+ 		case IS_FAILED:
+ 		case IS_DOWN:
+ 			continue;
++		default:
++			break;
+ 		}
+ 
+ 		/*
+Index: git/src/main/module/depend.c
+===================================================================
+--- git.orig/src/main/module/depend.c
++++ git/src/main/module/depend.c
+@@ -120,8 +120,6 @@ int module_is_needed(const char *module_
+ 
+ 	while_module_db(m) {
+ 		/* if not this module, have needs set, continue.. */
+-		if (!(m->modinfo->deps))
+-			continue;
+ 		needs = m->modinfo->deps;
+ 
+ 		while (*needs) {
+Index: git/src/main/module/load.c
+===================================================================
+--- git.orig/src/main/module/load.c
++++ git/src/main/module/load.c
+@@ -247,13 +247,13 @@ m_h *initng_module_load(const char *modu
+ 	/* free, these are duped in initng_module_open(a,b) */
+ 	if (module_name != module)
+ 		free(module_name);
+-	free(module_path);
+ 
+ 	/* see if we have our dependencies met */
+ 	if (!module_needs_are_loaded(new_m)) {
+ 		F_("Not loading module \"%s\", missing needed module(s)\n",
+ 		   module_path);
+ 		initng_module_close_and_free(new_m);
++		free(module_path);
+ 		return NULL;
+ 	}
+ 
+@@ -263,11 +263,13 @@ m_h *initng_module_load(const char *modu
+ 	} else {
+ 		F_("Module %s did not load correctly\n", module_path);
+ 		initng_module_close_and_free(new_m);
++		free(module_path);
+ 		return NULL;
+ 	}
+ 
+ 	assert(new_m->name);
+ 	initng_list_add(&new_m->list, &g.module_db.list);
++	free(module_path);
+ 	/* and we're done */
+ 	return new_m;
+ }
+Index: git/src/modules/also/initng_also.c
+===================================================================
+--- git.orig/src/modules/also/initng_also.c
++++ git/src/modules/also/initng_also.c
+@@ -102,6 +102,9 @@ static void service_state(s_event * even
+ 			}
+ 		}
+ 		break;
++
++	default:
++		break;
+ 	}
+ }
+ 
+Index: git/src/modules/chroot/initng_chroot.c
+===================================================================
+--- git.orig/src/modules/chroot/initng_chroot.c
++++ git/src/modules/chroot/initng_chroot.c
+@@ -17,7 +17,7 @@
+  *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+  */
+ 
+-#define _BSD_SOURCE
++#define _DEFAULT_SOURCE
+ 
+ #include <unistd.h>
+ #include <stdio.h>
+Index: git/src/modules/conflict/initng_conflict.c
+===================================================================
+--- git.orig/src/modules/conflict/initng_conflict.c
++++ git/src/modules/conflict/initng_conflict.c
+@@ -89,6 +89,8 @@ static void check_conflict(s_event * eve
+ 			F_("Service \"%s\" is conflicting with service "
+ 			   "\"%s\"!\n", service->name, s->name);
+ 			return;
++		default:
++			break;
+ 		}
+ 	}
+ }
+Index: git/src/modules/cpout/initng_cpout.c
+===================================================================
+--- git.orig/src/modules/cpout/initng_cpout.c
++++ git/src/modules/cpout/initng_cpout.c
+@@ -272,6 +272,9 @@ static void print_output(s_event * event
+ 				service->current_state->name);
+ 		}
+ 		break;
++
++	default:
++		break;
+ 	}
+ 
+ 	fflush(output);
+Index: git/src/modules/fmon/initng_fmon.c
+===================================================================
+--- git.orig/src/modules/fmon/initng_fmon.c
++++ git/src/modules/fmon/initng_fmon.c
+@@ -17,7 +17,7 @@
+  *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+  */
+ 
+-#define _BSD_SOURCE
++#define _DEFAULT_SOURCE
+ 
+ /* the standard intotify headers */
+ #include "inotify.h"
+Index: git/src/modules/lockfile/initng_lockfile.c
+===================================================================
+--- git.orig/src/modules/lockfile/initng_lockfile.c
++++ git/src/modules/lockfile/initng_lockfile.c
+@@ -81,6 +81,9 @@ static void status_change(s_event * even
+ 			D_("service went down\n");
+ 			unlink(lockfile);
+ 			break;
++
++		default:
++			break;
+ 		}
+ 	}
+ }
+Index: git/src/modules/netdev/initng_netdev.c
+===================================================================
+--- git.orig/src/modules/netdev/initng_netdev.c
++++ git/src/modules/netdev/initng_netdev.c
+@@ -17,7 +17,7 @@
+  *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+  */
+ 
+-#define _BSD_SOURCE
++#define _DEFAULT_SOURCE
+ 
+ #include <stdio.h>
+ #include <stdlib.h>		/* free() exit() */
+Index: git/src/modules/ngc4/initng_ngc4.c
+===================================================================
+--- git.orig/src/modules/ngc4/initng_ngc4.c
++++ git/src/modules/ngc4/initng_ngc4.c
+@@ -267,7 +267,7 @@ static void handle_client(int fd)
+ 		if (!tmp_cmd)
+ 			tmp_cmd = initng_command_find_by_command_id(header.c);
+ 		/* find by long opt */
+-	} else if (header.l) {
++	} else if (header.l[0] != '\0') {
+ 		/* first search in the local db */
+ 		tmp_cmd = lfbs(header.l);
+ 		if (!tmp_cmd)
+Index: git/src/modules/suid/initng_suid.c
+===================================================================
+--- git.orig/src/modules/suid/initng_suid.c
++++ git/src/modules/suid/initng_suid.c
+@@ -17,7 +17,7 @@
+  *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+  */
+ 
+-#define _BSD_SOURCE	/* initgroups() */
++#define _DEFAULT_SOURCE	/* initgroups() */
+ 
+ #include <initng.h>
+ 
+@@ -116,7 +116,8 @@ static void do_suid(s_event * event)
+ 
+ 	if (gid) {
+ 		D_("Change to gid %i", gid);
+-		setgid(gid);
++		int ignored __attribute__((unused));
++		ignored = setgid(gid);
+ 	}
+ 
+ 	if (passwd)
+@@ -124,7 +125,8 @@ static void do_suid(s_event * event)
+ 
+ 	if (uid) {
+ 		D_("Change to uid %i", uid);
+-		setuid(uid);
++		int ignored __attribute__((unused));
++		ignored = setuid(uid);
+ 
+ 		/* Set UID-related env variables */
+ 		adjust_env(data->service, "USER", passwd->pw_name);
+Index: git/src/modules/syslog/initng_syslog.c
+===================================================================
+--- git.orig/src/modules/syslog/initng_syslog.c
++++ git/src/modules/syslog/initng_syslog.c
+@@ -181,6 +181,9 @@ static void syslog_print_status_change(s
+ 		initng_log(LOG_NOTICE, NULL, "Service %s is starting.\n",
+ 			   service->name);
+ 		break;
++
++	default:
++		break;
+ 	}
+ }
+ 
+Index: git/src/tools/killalli5.c
+===================================================================
+--- git.orig/src/tools/killalli5.c
++++ git/src/tools/killalli5.c
+@@ -47,7 +47,7 @@
+ #include <getopt.h>
+ #include <stdarg.h>
+ #include <fcntl.h>
+-
++#include <limits.h>
+ 
+ 
+ char *ignorelist = NULL;
+@@ -195,7 +195,7 @@ static int readproc(void)
+ 	PROC *p, *n;
+ 	struct dirent *d;
+ 	struct stat st;
+-	char path[256];
++	char path[PATH_MAX];
+ 	char buf[256];
+ 	char *s, *q;
+ 	unsigned long startcode, endcode;
+
+Index: git/src/tools/sulogin.c
+===================================================================
+--- git.orig/src/tools/sulogin.c
++++ git/src/tools/sulogin.c
+@@ -161,7 +161,7 @@ struct passwd *getrootpwent(int try_manu
+ 	/*
+ 	 *      Find root in the password file.
+ 	 */
+-	while (p = fgets(line, 256, fp)) {
++	while ((p = fgets(line, 256, fp))) {
+ 		if (strncmp(line, "root:", 5) != 0)
+ 			continue;
+ 		p += 5;
+@@ -197,7 +197,7 @@ struct passwd *getrootpwent(int try_manu
+ 		fprintf(stderr, "%s: root password garbled\n", F_PASSWD);
+ 		return &pwd;
+ 	}
+-	while (p = fgets(sline, 256, fp)) {
++	while ((p = fgets(sline, 256, fp))) {
+ 		if (strncmp(sline, "root:", 5) != 0)
+ 			continue;
+ 		p += 5;
+@@ -279,16 +279,16 @@ void sushell(struct passwd *pwd)
+ 	char home[128];
+ 	char *p;
+ 	char *sushell;
+-	char *rvcwd; /* pseudo return value to suppress compiler warnings */
+-	int rvchdir; /* pseudo return value to suppress compiler warnings */
++	char *rvcwd __attribute__((unused)); /* pseudo return value to suppress compiler warnings */
++	int rvchdir __attribute__((unused)); /* pseudo return value to suppress compiler warnings */
+ 
+ 	/*
+ 	 *      Set directory and shell.
+ 	 */
+ 	rvchdir = chdir(pwd->pw_dir);
+-	if (p = getenv("SUSHELL"))
++	if ((p = getenv("SUSHELL")))
+ 		sushell = p;
+-	else if (p = getenv("sushell"))
++	else if ((p = getenv("sushell")))
+ 		sushell = p;
+ 	else if (pwd->pw_shell[0]) {
+ 		sushell = pwd->pw_shell;
+@@ -341,7 +341,7 @@ int main(int argc, char **argv)
+ 	int c, fd = -1;
+ 	int opt_e = 0;
+ 	pid_t pid, pgrp, ppgrp, ttypgrp;
+-	int rvdup; /* pseudo return value to suppress compiler warnings */
++	int rvdup __attribute__((unused)); /* pseudo return value to suppress compiler warnings */
+ 
+ 	/*
+ 	 *      See if we have a timeout flag.

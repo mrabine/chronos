@@ -1,0 +1,28 @@
+#!/sbin/runiscript
+# SERVICE: runlevel
+# NAME: runlevel
+# DESCRIPTION:
+# COPYRIGHT:
+# WWW:
+
+read_dependencies() {
+    while read DEP; do
+        case "$DEP" in
+            \#*) ;;
+            *)
+                DEPS="$DEPS $DEP"
+            ;;
+        esac
+    done < "$1"
+}
+
+setup() {
+    DEPS=""
+    DEFAULT_RUNLEVEL="/etc/initng/default.runlevel"
+    if [ -r "$DEFAULT_RUNLEVEL" ]; then
+        read_dependencies $DEFAULT_RUNLEVEL
+    fi
+    iregister runlevel
+        iset need = $DEPS
+    idone
+}

@@ -1,0 +1,15 @@
+#!/sbin/runiscript
+# SERVICE: system/hostname
+# NAME: hostname
+# DESCRIPTION:
+
+setup() {
+    iregister service
+        iset need = system/mountfs
+        iexec start
+    idone
+}
+
+start() {
+    hostname -F /etc/hostname
+}

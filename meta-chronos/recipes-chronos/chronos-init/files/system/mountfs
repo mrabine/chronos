@@ -1,0 +1,21 @@
+#!/sbin/runiscript
+# SERVICE: system/mountfs
+# NAME: mountfs
+# DESCRIPTION:
+
+setup() {
+    iregister service
+        iexec start
+        iexec stop
+    idone
+}
+
+start() {
+    mkdir -p /dev/pts
+    mount -a -t tmpfs,proc,sysfs,devpts
+}
+
+stop() {
+    sync
+    sleep 2
+}

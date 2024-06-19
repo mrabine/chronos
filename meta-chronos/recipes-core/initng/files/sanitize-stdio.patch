@@ -1,0 +1,101 @@
+Index: git/src/preinit/main.c
+===================================================================
+--- git.orig/src/preinit/main.c
++++ git/src/preinit/main.c
+@@ -17,6 +17,9 @@
+  *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+  */
+ 
++#define _DEFAULT_SOURCE
++
++#include <stdlib.h>
+ #include <termios.h>
+ #include <unistd.h>
+ #include <sys/reboot.h>
+@@ -37,13 +40,23 @@
+ 
+ #include "selinux.h"
+ 
+-#ifndef CBAUD // FIXME
+-#define CBAUD   0
+-#define CBAUDEX 0
+-#define ECHOCTL 0
+-#define ECHOKE  0
+-#define ECHOPRT 0
+-#endif
++static inline
++void sanitize_stdio(void)
++{
++	int fd = open("/dev/null", O_RDWR);
++	if (fd < 0) {
++		F_("Failed to sanitize stdio.\r\n");
++		initng_main_su_login();
++	}
++
++	// Make sure fd 0, 1 and 2 won't be used by future open.
++	while (fd < 2)
++		fd = dup(fd);
++
++	// Close /dev/null if necessary.
++	if (fd > 2)
++		close(fd);
++}
+ 
+ static inline
+ void setup_console(const char *console)
+@@ -54,8 +67,11 @@ void setup_console(const char *console)
+ 	fd = open(console, O_RDWR | O_NOCTTY);
+ 
+ 	/* Try to open the console, but don't control it */
+-	if (fd > 0)
+-		fd = 0;
++	if (fd < 0) {
++		W_("Failed to open the console.\r\n");
++		sanitize_stdio();
++		return;
++	}
+ 
+ 	/* Accept signals from 'kbd' */
+ 	/* Like Ctrl + Alt + Delete signal? */
+@@ -90,6 +106,11 @@ void setup_console(const char *console)
+ 	 */
+ 	tcsetattr(fd, TCSANOW, &tty);
+ 	tcflush(fd, TCIOFLUSH);
++
++	dup2(fd, STDIN_FILENO);
++	dup2(fd, STDOUT_FILENO);
++	dup2(fd, STDERR_FILENO);
++
+ 	close(fd);
+ }
+ 
+@@ -122,7 +143,7 @@ int main(int argc, char *argv[], char *e
+ 
+ 	/* enable generation of core files */
+ 	{
+-		struct rlimit c = { 1000000, 1000000 };
++		struct rlimit c = { 100000000, 100000000 };
+ 		setrlimit(RLIMIT_CORE, &c);
+ 	}
+ 
+@@ -133,8 +154,10 @@ int main(int argc, char *argv[], char *e
+ 
+ 	/* Look for "console" option, so we open the desired device. */
+ 	for (int i = argc; i > 0; i--) {
+-		if (strncmp(argv[i], "console", 7) == 0
+-		    && (argv[i][7] == ':' || argv[i][7] == '=')) {
++		if ((argv[i] != NULL)
++			&& (strlen(argv[i]) > 8)
++			&& (strncmp(argv[i], "console", 7) == 0)
++			&& (argv[i][7] == ':' || argv[i][7] == '=')) {
+ 			console = &argv[i][8];
+ 			break;
+ 		}
+@@ -143,6 +166,6 @@ int main(int argc, char *argv[], char *e
+ 	setup_console(console);
+ 
+ 	argv[0] = (char *) INITNG_CORE_BIN;
+-	execv(argv[0], argv);
++	execve(argv[0], argv, env);
+ 	return 1;
+ }

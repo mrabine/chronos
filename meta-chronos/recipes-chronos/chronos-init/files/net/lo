@@ -1,0 +1,21 @@
+#!/sbin/runiscript
+# SERVICE: net/lo
+# NAME: lo
+# DESCRIPTION: bring up loopback interface
+# WWW:
+
+setup() {
+    iregister service
+        iset provide = virtual/net
+        iexec start
+        iexec stop
+    idone
+}
+
+start() {
+    ifconfig lo up
+}
+
+stop() {
+    ifconfig lo down
+}

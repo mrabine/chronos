@@ -1,0 +1,20 @@
+#!/sbin/runiscript
+# SERVICE: daemon/getty
+# NAME: getty
+# DESCRIPTION:
+
+setup() {
+    iregister daemon
+        iset need = system/essentials
+        iset respawn_pause = 1
+        iset respawn_rate = 0
+        iset respawn
+        iset last
+        iset term_timeout = 3
+        iexec daemon
+    idone
+}
+
+daemon() {
+    exec getty -L 38400 ttyS0 xterm
+}

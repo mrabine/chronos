@@ -1,0 +1,51 @@
+Index: git/src/modules/service_file/bp.c
+===================================================================
+--- git.orig/src/modules/service_file/bp.c
++++ git/src/modules/service_file/bp.c
+@@ -183,7 +183,7 @@ int main(int argc, char **argv)
+ 	/* copy all entries */
+ 	new_argc = 0;
+ 	for (int i = 1; argv[i]; i++) {
+-		new_argv[new_argc++] = argv[i];
++		new_argv[++new_argc] = argv[i];
+ 	}
+ 
+ 	if (DEBUG_EXTRA) {
+Index: git/src/main/active_db/find.c
+===================================================================
+--- git.orig/src/main/active_db/find.c
++++ git/src/main/active_db/find.c
+@@ -76,6 +76,8 @@ active_db_h *initng_active_db_find_by_pi
+ 	while_active_db(currentA) {
+ 		currentP = NULL;
+ 		while_processes(currentP, currentA) {
++			if (currentP->pst != P_ACTIVE)
++				continue;
+ 			if (currentP->pid == pid)
+ 				return currentA;
+ 		}
+Index: git/src/main/active_db/percent.c
+===================================================================
+--- git.orig/src/main/active_db/percent.c
++++ git/src/main/active_db/percent.c
+@@ -46,6 +46,7 @@ int initng_active_db_percent_started(voi
+ 		assert(current->current_state);
+ 
+ 		switch (GET_STATE(current)) {
++		case IS_NEW:
+ 		case IS_STARTING:
+ 			starting++;
+ 			break;
+Index: git/src/main/interrupt/check_sys_state.c
+===================================================================
+--- git.orig/src/main/interrupt/check_sys_state.c
++++ git/src/main/interrupt/check_sys_state.c
+@@ -42,7 +42,7 @@ void check_sys_state_up(void)
+ 	/* check actives, if any has one of these status, system cant be set
+ 	 * to STATE_UP */
+ 	while_active_db(current) {
+-		if (GET_STATE(current) == IS_STARTING)
++		if (GET_STATE(current) != IS_UP)
+ 			return;
+ 	}
+ 

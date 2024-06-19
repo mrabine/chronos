@@ -1,0 +1,38 @@
+#!/bin/sh
+
+if [ -n "$BASH_SOURCE" ]; then
+    THIS_SCRIPT=$BASH_SOURCE
+elif [ -n "$ZSH_NAME" ]; then
+    THIS_SCRIPT=$0
+else
+    THIS_SCRIPT="$(pwd)/chronos-init-build-env"
+fi
+if [ -n "$BBSERVER" ]; then
+    unset BBSERVER
+fi
+
+if [ -z "$ZSH_NAME" ] && [ "$0" = "$THIS_SCRIPT" ]; then
+    echo "Error: This script needs to be sourced. Please run as '. $THIS_SCRIPT'" >&2
+    exit 1
+fi
+
+if [ -z "$CHRONOSROOT" ]; then
+    CHRONOSROOT=$(dirname "$THIS_SCRIPT")
+    CHRONOSROOT=$(readlink -f "$CHRONOSROOT")
+fi
+unset THIS_SCRIPT
+
+export CHRONOSROOT
+. "$CHRONOSROOT"/scripts/chronos-buildenv-internal &&
+    TEMPLATECONF="$CHRONOSROOT/conf/templates/default" "$CHRONOSROOT"/scripts/chronos-setup-builddir || {
+    unset CHRONOSROOT
+    return 1
+}
+unset CHRONOSROOT
+
+# Generate an initial configuration for VSCode and the yocto-bitbake plugin.
+if command -v code > /dev/null && [ ! -d "$WORKDIR/.vscode" ]; then
+   chronos-setup-vscode "$WORKDIR" "$BUILDDIR"
+fi
+
+[ -z "$BUILDDIR" ] || cd "$BUILDDIR"

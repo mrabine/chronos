@@ -1,0 +1,25 @@
+#!/sbin/runiscript
+# SERVICE: service/genkey
+# NAME: genkey
+# DESCRIPTION:
+
+KEY_PATH="/etc/dropbear"
+ECDSA_HOST_KEY="${KEY_PATH}/ecdsa_host_key"
+
+KEY_GEN="dropbearkey"
+
+setup() {
+    iregister service
+        iset need = system/essentials
+        iset stdall = /dev/null
+        iexec start
+    idone
+}
+
+start() {
+    mkdir -m 0700 -p ${KEY_PATH}
+    if [ ! -s ${ECDSA_HOST_KEY} ]; then
+      ${KEY_GEN} -t ecdsa -f ${ECDSA_HOST_KEY}
+      chmod 600 ${ECDSA_HOST_KEY}
+    fi
+}

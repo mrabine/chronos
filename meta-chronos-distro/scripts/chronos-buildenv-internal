@@ -1,0 +1,30 @@
+#!/bin/sh
+
+if [ -z "$CHRONOSROOT" ]; then
+    echo >&2 "Error: CHRONOSROOT is not defined!"
+    return 1
+fi
+
+if [ -z "$OEROOT" ]; then
+    OEROOT="$CHRONOSROOT/../poky"
+    OEROOT=$(realpath "$OEROOT")
+fi
+
+export OEROOT
+. "$OEROOT"/scripts/oe-buildenv-internal || {
+    unset OEROOT
+    return 1
+}
+unset OEROOT
+
+WORKDIR=$(dirname "$BUILDDIR")
+WORKDIR=$(readlink -f "$WORKDIR")
+
+# Remove any paths added by sourcing this script before
+[ -n "$CHRONOS_ADDED_PATHS" ] && PATH=$(echo $PATH | sed -e "s#$CHRONOS_ADDED_PATHS##") ||
+    PATH=$(echo $PATH | sed -e "s#$CHRONOSROOT/scripts:##")
+
+# Make sure our paths are at the beginning of $PATH
+CHRONOS_ADDED_PATHS="$CHRONOSROOT/scripts:"
+PATH="$CHRONOS_ADDED_PATHS$PATH"
+export CHRONOS_ADDED_PATHS
