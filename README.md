@@ -57,5 +57,9 @@ MACHINE=<machine> bitbake meta-ide-support
 ```
 
 ```bash
-MACHINE=<machine> bitbake build-sysroots
+MACHINE=<machine> bitbake -c build_native_sysroot build-sysroots
+```
+
+```bash
+MACHINE=<machine> bitbake -c build_target_sysroot build-sysroots
 ```
