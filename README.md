@@ -12,7 +12,7 @@
 ## Prerequisites <a id="prerequisites-id"></a>
 
 ```bash
-sudo apt install build-essential chrpath diffstat gawk lz4 tmux python3-setuptools
+sudo apt install build-essential chrpath cpio diffstat file gawk lz4 tmux zstd python3-setuptools
 ```
 
 ## Repository cloning <a id="clone-id"></a>
