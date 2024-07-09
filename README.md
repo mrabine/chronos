@@ -12,6 +12,14 @@
 ## Prerequisites <a id="prerequisites-id"></a>
 
 ```bash
+sudo apt update
+```
+
+```bash
+sudo apt upgrade
+```
+
+```bash
 sudo apt install build-essential chrpath cpio diffstat file gawk lz4 tmux zstd python3-setuptools
 ```
 
