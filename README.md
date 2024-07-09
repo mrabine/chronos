@@ -18,7 +18,7 @@ sudo apt install build-essential chrpath cpio diffstat file gawk lz4 tmux zstd p
 ## Repository cloning <a id="clone-id"></a>
 
 ```bash
-git clone git@github.com:mrabine/chronos.git
+git clone https://github.com/mrabine/chronos.git
 ```
 
 ```bash
