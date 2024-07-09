@@ -49,7 +49,7 @@ git submodule update --init --recursive
 > Available machines: **daytona** (default)
 
 ```bash
-MACHINE=<machine> bitbake chronos-image
+MACHINE=daytona bitbake chronos-image
 ```
 
 ## Running the image <a id="run-id"></a>
@@ -61,13 +61,13 @@ runqemu nographic
 ## Debugging the image <a id="debug-id"></a>
 
 ```bash
-MACHINE=<machine> bitbake meta-ide-support
+MACHINE=daytona bitbake meta-ide-support
 ```
 
 ```bash
-MACHINE=<machine> bitbake -c build_native_sysroot build-sysroots
+MACHINE=daytona bitbake -c build_native_sysroot build-sysroots
 ```
 
 ```bash
-MACHINE=<machine> bitbake -c build_target_sysroot build-sysroots
+MACHINE=daytona bitbake -c build_target_sysroot build-sysroots
 ```
