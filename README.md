@@ -20,7 +20,7 @@ sudo apt upgrade
 ```
 
 ```bash
-sudo apt install build-essential chrpath cpio diffstat file gawk lz4 tmux zstd python3-setuptools
+sudo apt install build-essential chrpath cpio diffstat file gawk lz4 tmux zstd python3-setuptools iptables
 ```
 
 ## Repository cloning <a id="clone-id"></a>
