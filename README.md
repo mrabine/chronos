@@ -12,13 +12,21 @@
 ## Prerequisites <a id="prerequisites-id"></a>
 
 ```bash
-sudo apt install build-essential chrpath diffstat gawk lz4 tmux python3-setuptools
+sudo apt update
+```
+
+```bash
+sudo apt upgrade
+```
+
+```bash
+sudo apt install build-essential chrpath cpio diffstat file gawk lz4 tmux zstd python3-setuptools
 ```
 
 ## Repository cloning <a id="clone-id"></a>
 
 ```bash
-git clone git@github.com:mrabine/chronos.git
+git clone https://github.com/mrabine/chronos.git
 ```
 
 ```bash
@@ -41,7 +49,7 @@ git submodule update --init --recursive
 > Available machines: **daytona** (default)
 
 ```bash
-MACHINE=<machine> bitbake chronos-image
+MACHINE=daytona bitbake chronos-image
 ```
 
 ## Running the image <a id="run-id"></a>
@@ -53,13 +61,13 @@ runqemu nographic
 ## Debugging the image <a id="debug-id"></a>
 
 ```bash
-MACHINE=<machine> bitbake meta-ide-support
+MACHINE=daytona bitbake meta-ide-support
 ```
 
 ```bash
-MACHINE=<machine> bitbake -c build_native_sysroot build-sysroots
+MACHINE=daytona bitbake -c build_native_sysroot build-sysroots
 ```
 
 ```bash
-MACHINE=<machine> bitbake -c build_target_sysroot build-sysroots
+MACHINE=daytona bitbake -c build_target_sysroot build-sysroots
 ```
