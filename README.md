@@ -55,7 +55,7 @@ MACHINE=daytona bitbake chronos-image
 ## Running the image <a id="run-id"></a>
 
 ```bash
-runqemu nographic
+MACHINE=daytona runqemu nographic
 ```
 
 ## Debugging the image <a id="debug-id"></a>
