@@ -24,6 +24,7 @@ SRC_URI += " \
     file://fix-runiscrit.patch \
     file://fix-runlevel.patch \
     file://sanitize-stdio.patch \
+    file://fix-fmon.patch \
     file://default \
 "
 

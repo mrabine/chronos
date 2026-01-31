@@ -1,0 +1,50 @@
+#!/sbin/runiscript
+# SERVICE: system/cmdline
+# NAME: cmdline
+# DESCRIPTION:
+
+setup(){
+    iregister service
+        iset need = system/pci
+        iset stdall = /dev/null
+        iexec start
+    idone
+}
+
+start(){
+    local line CLIENT_IP GATEWAY NETMASK DEVICE AUTOCONF DNS
+    line=$(cat /proc/cmdline | tr ' ' '\n' | grep '^ip=')
+
+    if [ -z "$line" ]; then
+        exit 0
+    fi
+
+    CLIENT_IP=$(echo "$line" | cut -d: -f1 | cut -d= -f2)
+    GATEWAY=$(echo "$line" | cut -d: -f3)
+    NETMASK=$(echo "$line" | cut -d: -f4)
+    DEVICE=$(echo "$line" | cut -d: -f6)
+    AUTOCONF=$(echo "$line" | cut -d: -f7)
+    DNS=$(echo "$line" | cut -d: -f8)
+
+    if [ -z "$CLIENT_IP" ] || [ -z "$DEVICE" ]; then
+        exit 0
+    fi
+
+    if [ ! -e "/sys/class/net/$DEVICE" ]; then
+        exit 0
+    fi
+
+    ip addr flush dev "$DEVICE" && \
+    ip addr add "$CLIENT_IP/$NETMASK" dev "$DEVICE" && \
+    ip link set "$DEVICE" up
+
+    if [ -n "$GATEWAY" ]; then
+        ip route add default via "$GATEWAY" dev "$DEVICE"
+    fi
+
+    if [ -n "$DNS" ]; then
+        echo "nameserver $DNS" > /etc/resolv.conf
+    fi
+
+    exit 0
+}

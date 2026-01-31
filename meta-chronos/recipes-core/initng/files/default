@@ -2,8 +2,6 @@
 # SERVICE: runlevel
 # NAME: runlevel
 # DESCRIPTION:
-# COPYRIGHT:
-# WWW:
 
 read_dependencies() {
     while read DEP; do

@@ -1,0 +1,60 @@
+#!/sbin/runiscript
+# SERVICE: system/modules
+# NAME: modules
+# DESCRIPTION:
+
+setup() {
+    iregister service
+        iset need = system/depmod
+        iset stdall = /dev/null
+        iexec start
+        iexec stop
+    idone
+}
+
+start() {
+    # check if kernel module support exists
+    [ -f /proc/modules ] || exit 0
+    
+    # check if modules base directory exists
+    [ -d "/lib/modules" ] || exit 0
+    
+    # check if modules directory for current kernel exists
+    KERNEL_VERSION=$(uname -r)
+    [ -d "/lib/modules/$KERNEL_VERSION" ] || exit 0
+    
+    # check if /etc/modules file exists and is not empty
+    [ -f /etc/modules ] || exit 0
+    [ -s /etc/modules ] || exit 0
+    
+    # load modules using system/module/* services
+    while read -r module args; do
+        case "$module" in
+            ""|\#*) continue ;;
+        esac
+        # start the module service
+        ngc -u system/module/$module start 2>/dev/null
+    done < /etc/modules
+    
+    exit 0
+}
+
+stop() {
+    # check if kernel module support exists
+    [ -f /proc/modules ] || exit 0
+    
+    # check if /etc/modules file exists and is not empty
+    [ -f /etc/modules ] || exit 0
+    [ -s /etc/modules ] || exit 0
+    
+    # unload modules in reverse order using system/module/* services
+    tac /etc/modules | while read -r module args; do
+        case "$module" in
+            ""|\#*) continue ;;
+        esac
+        # stop the module service
+        ngc -u system/module/$module stop 2>/dev/null
+    done
+    
+    exit 0
+}

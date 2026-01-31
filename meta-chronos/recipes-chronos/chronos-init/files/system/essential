@@ -1,0 +1,10 @@
+#!/sbin/runiscript
+# SERVICE: system/essential
+# NAME: essentials
+# DESCRIPTION:
+
+setup(){
+    iregister virtual
+        iset need = system/sysctl system/depmod system/modules system/hostname system/hwclock daemon/mdev daemon/rngd daemon/syslogd
+    idone
+}

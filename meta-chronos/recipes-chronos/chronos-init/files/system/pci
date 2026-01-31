@@ -1,0 +1,28 @@
+#!/sbin/runiscript
+# SERVICE: system/pci
+# NAME: pci
+# DESCRIPTION:
+
+RENAME_SCRIPT=/etc/mdev/pci.sh
+
+setup(){
+    iregister service
+        iset need = system/mountfs
+        iset stdall = /dev/null
+        iexec start
+    idone
+}
+
+start(){
+    for iface in /sys/class/net/eth*; do
+        [ -e "$iface" ] || continue
+        [ -L "$iface/device" ] || continue
+        MDEV=$(basename "$iface")
+        export MDEV
+        export ACTION=add
+        [ -x "$RENAME_SCRIPT" ] || continue
+        "$RENAME_SCRIPT"
+    done
+
+    exit 0
+}

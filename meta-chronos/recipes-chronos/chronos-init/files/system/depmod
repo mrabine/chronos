@@ -1,0 +1,26 @@
+#!/sbin/runiscript
+# SERVICE: system/depmod
+# NAME: depmod
+# DESCRIPTION:
+
+setup(){
+    iregister service
+        iset need = system/mountfs
+        iset stdall = /dev/null
+        iexec start
+    idone
+}
+
+start(){
+    # check if kernel module support exists
+    [ -f /proc/modules ] || exit 0
+
+    # check if modules base directory exists
+    [ -d "/lib/modules" ] || exit 0
+
+    # check if modules directory for current kernel exists
+    KERNEL_VERSION=$(uname -r)
+    [ -d "/lib/modules/$KERNEL_VERSION" ] || exit 0
+
+    /sbin/depmod -a
+}

@@ -3,19 +3,19 @@
 # NAME: mountfs
 # DESCRIPTION:
 
-setup() {
+setup(){
     iregister service
         iexec start
         iexec stop
     idone
 }
 
-start() {
+start(){
     mkdir -p /dev/pts
     mount -a -t tmpfs,proc,sysfs,devpts
 }
 
-stop() {
+stop(){
     sync
     sleep 2
 }

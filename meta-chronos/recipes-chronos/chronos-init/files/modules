@@ -1,0 +1,2 @@
+# /etc/modules: kernel modules to load at boot time.
+# each entry is a module name followed by optional arguments.

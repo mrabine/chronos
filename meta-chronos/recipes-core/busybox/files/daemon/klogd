@@ -1,0 +1,19 @@
+#!/sbin/runiscript
+# SERVICE: daemon/klogd
+# NAME: klogd
+# DESCRIPTION:
+
+setup(){
+    iregister daemon
+        iset need = daemon/syslogd
+        iset respawn_pause = 1
+        iset respawn_rate = 0
+        iset respawn
+        iset term_timeout = 10
+        iexec daemon
+    idone
+}
+
+daemon(){
+    exec /sbin/klogd -n
+}

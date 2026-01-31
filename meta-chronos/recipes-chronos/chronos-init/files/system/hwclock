@@ -1,0 +1,21 @@
+#!/sbin/runiscript
+# SERVICE: system/hwclock
+# NAME: hwclock
+# DESCRIPTION:
+
+setup(){
+    iregister service
+        iset need = system/mountfs
+        iset stdall = /dev/null
+        iexec start
+        iexec stop
+    idone
+}
+
+start(){
+    /sbin/hwclock --utc --hctosys
+}
+
+stop(){
+    /sbin/hwclock --utc --systohc
+}

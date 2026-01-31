@@ -8,7 +8,7 @@ PID_FILE="${RUN_PATH}/syslogd.pid"
 
 LOG_PATH="/var/volatile/log"
 
-setup() {
+setup(){
     iregister daemon
         iset need = system/mountfs
         iset pid_file = ${PID_FILE}
@@ -19,7 +19,7 @@ setup() {
     idone
 }
 
-daemon() {
+daemon(){
     mkdir -m 0755 -p ${RUN_PATH} ${LOG_PATH}
-    exec syslogd -n
+    exec /sbin/syslogd -n
 }

@@ -1,16 +1,24 @@
 require conf/distro/poky.conf
 
+DISTRO = "chronos"
 DISTRO_NAME = "chronos"
 DISTRO_VERSION = "1.0.0"
 
 # use packaging format ipk
 PACKAGE_CLASSES = "package_ipk"
 
+# host tools needed to run testimage
+HOSTTOOLS += "ip ping ps scp ssh"
+
 # drop native language support
 USE_NLS = "no"
 
 # make log dir volatile
 VOLATILE_LOG_DIR = "yes"
+
+# disable the hash equivalence server
+BB_SIGNATURE_HANDLER = "OEBasicHash"
+BB_HASHSERVE = ""
 
 # cache
 INHERIT += "own-mirrors"

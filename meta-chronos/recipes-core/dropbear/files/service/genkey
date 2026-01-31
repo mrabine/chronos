@@ -8,15 +8,15 @@ ECDSA_HOST_KEY="${KEY_PATH}/ecdsa_host_key"
 
 KEY_GEN="dropbearkey"
 
-setup() {
+setup(){
     iregister service
-        iset need = system/essentials
+        iset need = system/essential
         iset stdall = /dev/null
         iexec start
     idone
 }
 
-start() {
+start(){
     mkdir -m 0700 -p ${KEY_PATH}
     if [ ! -s ${ECDSA_HOST_KEY} ]; then
       ${KEY_GEN} -t ecdsa -f ${ECDSA_HOST_KEY}

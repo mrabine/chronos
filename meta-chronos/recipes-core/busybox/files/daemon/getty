@@ -3,9 +3,9 @@
 # NAME: getty
 # DESCRIPTION:
 
-setup() {
+setup(){
     iregister daemon
-        iset need = system/essentials
+        iset need = system/essential
         iset respawn_pause = 1
         iset respawn_rate = 0
         iset respawn
@@ -15,6 +15,6 @@ setup() {
     idone
 }
 
-daemon() {
-    exec getty -L 38400 ttyS0 xterm
+daemon(){
+    exec getty -L @SERIAL_BAUD@ @SERIAL_CONS@ xterm
 }

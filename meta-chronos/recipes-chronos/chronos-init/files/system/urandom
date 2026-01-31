@@ -1,0 +1,69 @@
+#!/sbin/runiscript
+# SERVICE: system/urandom
+# NAME: urandom
+# DESCRIPTION:
+
+RANDOM_SEED=/var/lib/random-seed
+POOL_FILE=/proc/sys/kernel/random/poolsize
+
+setup(){
+    iregister service
+        iset need = system/mountfs
+        iset stdall = /dev/null
+        iexec start
+        iexec stop
+    idone
+}
+
+start(){
+    local bits bytes seed_dir
+
+    seed_dir=$(dirname "$RANDOM_SEED")
+
+    # ensure directory exists
+    [ -d "$seed_dir" ] || mkdir -p "$seed_dir"
+
+    # load saved seed if it exists
+    if [ -f "$RANDOM_SEED" ]; then
+        cat "$RANDOM_SEED" > /dev/urandom 2>/dev/null
+    fi
+
+    # calculate seed size (default 4096 bits = 512 bytes)
+    if [ -r "$POOL_FILE" ]; then
+        bits=$(cat "$POOL_FILE")
+    else
+        bits=4096
+    fi
+
+    bytes=$((bits / 8))
+
+    # generate new seed for next boot
+    dd if=/dev/urandom of="$RANDOM_SEED" count=1 bs="$bytes" 2>/dev/null
+    chmod 600 "$RANDOM_SEED"
+
+    return 0
+}
+
+stop(){
+    local bits bytes seed_dir
+
+    seed_dir=$(dirname "$RANDOM_SEED")
+
+    # ensure directory exists
+    [ -d "$seed_dir" ] || mkdir -p "$seed_dir"
+
+    # calculate seed size
+    if [ -r "$POOL_FILE" ]; then
+        bits=$(cat "$POOL_FILE")
+    else
+        bits=4096
+    fi
+
+    bytes=$((bits / 8))
+
+    # save current entropy state
+    dd if=/dev/urandom of="$RANDOM_SEED" count=1 bs="$bytes" 2>/dev/null
+    chmod 600 "$RANDOM_SEED"
+
+    return 0
+}

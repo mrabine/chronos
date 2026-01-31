@@ -1,0 +1,21 @@
+#!/sbin/runiscript
+# SERVICE: daemon/rngd
+# NAME: rngd
+# DESCRIPTION:
+
+setup(){
+    iregister daemon
+        iset need = system/urandom
+        iset stdall = /dev/null
+        iset respawn_pause = 1
+        iset respawn_rate = 0
+        iset respawn
+        iset term_timeout = 1
+        iset daemon_fail_ok
+        iexec daemon
+    idone
+}
+
+daemon(){
+    exec rngd -f
+}

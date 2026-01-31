@@ -1,0 +1,23 @@
+#!/sbin/runiscript
+# SERVICE: system/module/any
+# NAME: 'any' is substituted with the true module name
+# DESCRIPTION: 
+
+setup() {
+    iregister service
+        iset startdep = system/depmod
+        iset stdall = /dev/null
+        iexec start
+        iexec stop
+    idone
+}
+
+start() {
+    /sbin/modprobe -q $NAME
+    exit 0
+}
+
+stop() {
+    /sbin/modprobe -q -r $NAME
+    exit 0
+}

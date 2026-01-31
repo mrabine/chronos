@@ -1,0 +1,62 @@
+Index: git/src/modules/fmon/initng_fmon.c
+===================================================================
+--- git.orig/src/modules/fmon/initng_fmon.c
++++ git/src/modules/fmon/initng_fmon.c
+@@ -20,8 +20,7 @@
+ #define _DEFAULT_SOURCE
+ 
+ /* the standard intotify headers */
+-#include "inotify.h"
+-#include "inotify-syscalls.h"
++#include <sys/inotify.h>
+ 
+ #include <stdio.h>
+ #include <stdlib.h>
+@@ -180,8 +179,7 @@ void filemon_event(f_module_h * from, e_
+ 			}
+ 
+ 			/* check if its initng binary modified */
+-			if (event->wd == initng_watch && event->len &&
+-			    strcmp(event->name, "/sbin/initng") == 0) {
++			if (event->wd == initng_watch) {
+ 				W_("/sbin/initng modified, reloading "
+ 				   "initng.\n");
+ 
+@@ -225,9 +223,7 @@ static int mon_dir(const char *dir)
+ 			continue;
+ 
+ 		/* set up full path */
+-		strncpy(file, dir, 40);
+-		strcat(file, "/");
+-		strcat(file, dir_e->d_name);
++		snprintf(file, sizeof(file), "%s/%s", dir, dir_e->d_name);
+ 
+ 		/* get the stat of that file */
+ 		if (stat(file, &fstat) != 0) {
+@@ -270,6 +266,8 @@ int module_init(void)
+ 	/* check so it succeded */
+ 	if (modules_watch < 0) {
+ 		F_("Fail to monitor \"%s\"\n", INITNG_MODULE_DIR);
++		close(fdh.fds);
++		fdh.fds = -1;
+ 		return FALSE;
+ 	}
+ 
+@@ -279,6 +277,9 @@ int module_init(void)
+ 	/* check so it succeded */
+ 	if (initng_watch < 0) {
+ 		F_("Fail to monitor \"/sbin/initng\"\n");
++		inotify_rm_watch(fdh.fds, modules_watch);
++		close(fdh.fds);
++		fdh.fds = -1;
+ 		return FALSE;
+ 	}
+ 
+@@ -297,6 +298,7 @@ void module_unload(void)
+ 
+ 	/* close sockets */
+ 	close(fdh.fds);
++	fdh.fds = -1;
+ 
+ 	/* remove hooks */
+ 	initng_event_hook_unregister(&EVENT_IO_WATCHER, &fdh_handler);
