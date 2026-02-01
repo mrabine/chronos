@@ -34,11 +34,7 @@ Chronos is a custom Linux distribution built with the Yocto Project, designed fo
 Update your system packages:
 
 ```bash
-sudo apt update
-```
-
-```bash
-sudo apt upgrade
+sudo apt update && sudo apt upgrade -y
 ```
 
 Install required build tools:
@@ -128,8 +124,8 @@ Test your image using QEMU:
 MACHINE=daytona runqemu chronos-image nographic
 ```
 
-**Keyboard shortcuts:**
-- Exit QEMU: `Ctrl+A` then `X`
+> [!TIP]
+> **Keyboard shortcuts** to exit QEMU: `Ctrl+A` then `X`
 
 ### Deploying to Hardware
 
