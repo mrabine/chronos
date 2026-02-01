@@ -1,7 +1,7 @@
 DESCRIPTION = "chronos image"
 LICENSE = "MIT"
 
-inherit image chronos-testimage
+inherit image chronos-rootfs-postcommands chronos-testimage
 
 # ensure package index is generated everytime image is built.
 addtask do_generate_package_index before do_image_qa after do_rootfs
@@ -29,9 +29,6 @@ IMAGE_INSTALL += "initng"
 # base init scripts
 IMAGE_INSTALL += "chronos-init"
 
-# random generator
-IMAGE_INSTALL += "rng-tools"
-
 # core
 IMAGE_INSTALL += "busybox"
 
@@ -41,19 +38,27 @@ IMAGE_INSTALL += "busybox-mdev"
 # syslog
 IMAGE_INSTALL += "busybox-syslog"
 
+# random generator
+IMAGE_INSTALL += "rng-tools"
+
 # ssh server
 IMAGE_INSTALL += "dropbear"
 
-# extra debug tools
-FEATURE_PACKAGES_chronos-debug = "chronos-debug"
+# join framework
+IMAGE_INSTALL += "join"
+
+# kernel modules
+IMAGE_INSTALL += "kernel-modules"
 
 # package management
 IMAGE_FEATURES += "package-management"
 
-# users
-inherit extrausers
+# extra debug tools
+FEATURE_PACKAGES_chronos-debug = "chronos-debug"
 
-EXTRA_USERS_PARAMS += "usermod -p \\\$6\\\$f9DDvk4TupAG.Q\\\$YqgvKKHaSWKy5oiPNgJmaGUZUoGypvAag8Cv4Uz177BDvwbI0aXvVMBGjV4kQI04/VFXMNAU612/Zi8aIArwq. root;"
+# image rootfs size
+IMAGE_ROOTFS_SIZE = "131072"
+IMAGE_ROOTFS_EXTRA_SPACE = "65536"
 
 # image type
 IMAGE_FSTYPES = 'ext4 ext4.gz'

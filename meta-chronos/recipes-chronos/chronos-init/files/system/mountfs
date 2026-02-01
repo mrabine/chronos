@@ -11,11 +11,43 @@ setup(){
 }
 
 start(){
-    mkdir -p /dev/pts
-    mount -a -t tmpfs,proc,sysfs,devpts
+    # devtmpfs may already be mounted by kernel
+    mount -t devtmpfs devtmpfs /dev 2>/dev/null || true
+
+    # required directories
+    mkdir -p /dev/pts /dev/shm /dev/mqueue /dev/hugepages
+    mkdir -p /dev/block /dev/char /dev/disk
+
+    # mount everything else from fstab (excluding devtmpfs)
+    mount -a -t nodevtmpfs
+
+    # enable swap
+    swapon -a
+
+    # create standard file descriptor symlinks
+    ln -sf /proc/self/fd /dev/fd
+    ln -sf /proc/self/fd/0 /dev/stdin
+    ln -sf /proc/self/fd/1 /dev/stdout
+    ln -sf /proc/self/fd/2 /dev/stderr
+    ln -sf /proc/kcore /dev/core
+
+    # create volatile runtime directories and set permissions
+    mkdir -p /run/lock /var/volatile/log /var/volatile/tmp
+    chmod 1777 /run/lock /var/volatile/tmp
+
+    exit 0
 }
 
 stop(){
+    # sync disk
     sync
     sleep 2
+
+    # disable swap
+    swapoff -a
+
+    # unmount all filesystems from fstab (ignore harmless errors)
+    umount -a -r 2>/dev/null || true
+
+    exit 0
 }

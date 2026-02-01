@@ -4,7 +4,8 @@
 # DESCRIPTION:
 
 KEY_PATH="/etc/dropbear"
-ECDSA_HOST_KEY="${KEY_PATH}/ecdsa_host_key"
+ECDSA_HOST_KEY="${KEY_PATH}/dropbear_ecdsa_host_key"
+RSA_HOST_KEY="${KEY_PATH}/dropbear_rsa_host_key"
 
 KEY_GEN="dropbearkey"
 
@@ -17,9 +18,18 @@ setup(){
 }
 
 start(){
+    # create dropbear key store
     mkdir -m 0700 -p ${KEY_PATH}
+
+    # generate ECDSA key if it doesn't exist
     if [ ! -s ${ECDSA_HOST_KEY} ]; then
       ${KEY_GEN} -t ecdsa -f ${ECDSA_HOST_KEY}
       chmod 600 ${ECDSA_HOST_KEY}
+    fi
+
+    # generate RSA key if it doesn't exist
+    if [ ! -s ${RSA_HOST_KEY} ]; then
+        ${KEY_GEN} -t rsa -f ${RSA_HOST_KEY}
+        chmod 600 ${RSA_HOST_KEY}
     fi
 }

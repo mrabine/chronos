@@ -3,7 +3,7 @@
 import os
 from oeqa.runtime.case import OERuntimeTestCase
 
-class TestPaths:
+class TestPath:
     base = os.path.join(OERuntimeTestCase.td['TOPDIR'],
                         OERuntimeTestCase.td['TMPDIR'],
                         'unittest',

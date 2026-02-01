@@ -7,7 +7,7 @@ RENAME_SCRIPT=/etc/mdev/pci.sh
 
 setup(){
     iregister service
-        iset need = system/mountfs
+        iset need = system/modules
         iset stdall = /dev/null
         iexec start
     idone

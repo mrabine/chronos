@@ -10,7 +10,7 @@ LOG_PATH="/var/volatile/log"
 
 setup(){
     iregister daemon
-        iset need = system/mountfs
+        iset need = system/modules
         iset pid_file = ${PID_FILE}
         iset respawn_pause = 1
         iset respawn_rate = 0

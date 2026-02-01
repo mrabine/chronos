@@ -138,7 +138,7 @@ EXTRA_IMAGE_FEATURES ?= "debug-tweaks chronos-debug"
 #
 # You can set (or append) test suite you want to be run by testimage to
 TEST_SUITES ?= " \
-    unittest \
+    unit_test \
 "
 #
 # You can set (or append) test case you want to be skipped by testimage to

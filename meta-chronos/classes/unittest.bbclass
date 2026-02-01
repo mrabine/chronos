@@ -3,7 +3,9 @@ PACKAGE_BEFORE_PN += "${PN}-test"
 DEPENDS += "gtest gmock"
 RDEPENDS:${PN}-test += "${PN}"
 
-PACKAGECONFIG:append = " test"
+RRECOMMENDS:${PN}-test += "kernel-module-dummy"
+
+PACKAGECONFIG += "test"
 
 FILES:${PN}-test += "${prefix}/share/${PN}/test/*"
 

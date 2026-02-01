@@ -8,7 +8,7 @@ POOL_FILE=/proc/sys/kernel/random/poolsize
 
 setup(){
     iregister service
-        iset need = system/mountfs
+        iset need = system/modules
         iset stdall = /dev/null
         iexec start
         iexec stop

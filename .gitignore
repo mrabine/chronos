@@ -1,5 +1,6 @@
-build*
-*.vscode
-*.cproject
-*.project
+.vscode
+.cproject
+.project
 
+build/
+__pycache__/

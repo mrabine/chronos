@@ -10,6 +10,6 @@ RDEPENDS:${PN} = " \
     ethtool \
     tcpdump \
     strace \
-    iperf \
+    iperf3 \
     ldd \
 "

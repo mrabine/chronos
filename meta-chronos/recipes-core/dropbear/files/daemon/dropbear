@@ -24,5 +24,6 @@ setup(){
 
 daemon(){
     mkdir -m 0755 -p ${RUN_PATH}
-    exec dropbear -F -j -k -r ${ECDSA_HOST_KEY}
+    [ -r /etc/default/dropbear ] && . /etc/default/dropbear
+    exec dropbear -F -j -k ${DROPBEAR_EXTRA_ARGS}
 }
