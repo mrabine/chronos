@@ -44,9 +44,6 @@ IMAGE_INSTALL += "rng-tools"
 # ssh server
 IMAGE_INSTALL += "dropbear"
 
-# join framework
-IMAGE_INSTALL += "join"
-
 # kernel modules
 IMAGE_INSTALL += "kernel-modules"
 
@@ -55,6 +52,9 @@ IMAGE_FEATURES += "package-management"
 
 # extra debug tools
 FEATURE_PACKAGES_chronos-debug = "chronos-debug"
+
+# make sure libraries needed are added to the SDK
+TOOLCHAIN_TARGET_TASK += "packagegroup-chronos-sdk-target"
 
 # image rootfs size
 IMAGE_ROOTFS_SIZE = "131072"
