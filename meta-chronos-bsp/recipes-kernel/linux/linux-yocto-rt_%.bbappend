@@ -28,6 +28,7 @@ SRC_URI += " \
     file://ipv4.cfg \
     file://ipv6.cfg \
     file://virt.cfg \
+    file://rdma.cfg \
     file://ptp.cfg \
     file://nls.cfg \
     ${@bb.utils.contains('TARGET_ARCH', 'aarch64', 'file://scmi.cfg', '', d)} \
