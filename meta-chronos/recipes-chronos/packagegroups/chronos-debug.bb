@@ -1,4 +1,5 @@
-SUMMARY = "Debugging tools for chronos"
+SUMMARY = "Chronos debugging tools"
+LICENSE = "MIT"
 
 inherit packagegroup
 
@@ -7,6 +8,7 @@ RDEPENDS:${PN} = " \
     gdbserver \
     binutils \
     rt-tests \
+    perftest \
     ethtool \
     tcpdump \
     strace \

@@ -1,4 +1,5 @@
-SUMMARY = "chronos host dependencies required in SDK"
+SUMMARY = "Chronos host dependencies required in SDK"
+LICENSE = "MIT"
 
 inherit packagegroup
 

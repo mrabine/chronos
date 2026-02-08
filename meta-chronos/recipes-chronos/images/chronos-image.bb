@@ -48,13 +48,10 @@ IMAGE_INSTALL += "dropbear"
 IMAGE_INSTALL += "iproute2"
 
 # rdma
-IMAGE_INSTALL += "rdma-core iproute2-rdma perftest"
+IMAGE_INSTALL += "rdma-core iproute2-rdma"
 
 # ptp
 IMAGE_INSTALL += "linuxptp"
-
-# kernel modules
-IMAGE_INSTALL += "kernel-modules"
 
 # package management
 IMAGE_FEATURES += "package-management"
