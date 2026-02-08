@@ -6,6 +6,6 @@ RDEPENDS:${PN} = " \
     libstdc++-dev \
     googletest-dev \
     capnproto-dev \
-    join-dev \
     rdma-core-dev \
+    libxpmem-dev \
 "
