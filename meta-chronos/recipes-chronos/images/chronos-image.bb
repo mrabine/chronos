@@ -38,7 +38,7 @@ IMAGE_INSTALL += "busybox-mdev"
 # syslog
 IMAGE_INSTALL += "busybox-syslog"
 
-# random generator
+# random generator tools
 IMAGE_INSTALL += "rng-tools"
 
 # ssh server
@@ -48,7 +48,7 @@ IMAGE_INSTALL += "dropbear"
 IMAGE_INSTALL += "iproute2"
 
 # rdma
-IMAGE_INSTALL += "rdma-core qperf"
+IMAGE_INSTALL += "rdma-core iproute2-rdma perftest"
 
 # ptp
 IMAGE_INSTALL += "linuxptp"
