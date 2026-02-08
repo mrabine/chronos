@@ -14,7 +14,6 @@ S = "${WORKDIR}/git"
 
 EXTRA_OECONF = " \
     --disable-kernel-module \
-    --with-kerneldir=${STAGING_KERNEL_DIR} \
 "
 
 FILES:${PN} += " \

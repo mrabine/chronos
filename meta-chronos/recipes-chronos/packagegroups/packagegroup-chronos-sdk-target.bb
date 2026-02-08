@@ -9,4 +9,6 @@ RDEPENDS:${PN} = " \
     rdma-core-dev \
     libxpmem-dev \
     join-dev \
+    ucx-dev \
+    ucc-dev \
 "
