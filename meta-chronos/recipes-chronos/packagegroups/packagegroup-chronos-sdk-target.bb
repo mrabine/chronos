@@ -8,4 +8,5 @@ RDEPENDS:${PN} = " \
     capnproto-dev \
     rdma-core-dev \
     libxpmem-dev \
+    join-dev \
 "

@@ -21,23 +21,7 @@ PACKAGECONFIG[fabric] = "-DJOIN_ENABLE_FABRIC=ON,-DJOIN_ENABLE_FABRIC=OFF"
 PACKAGECONFIG[services] = "-DJOIN_ENABLE_SERVICES=ON,-DJOIN_ENABLE_SERVICES=OFF"
 PACKAGECONFIG[test] = "-DJOIN_ENABLE_TESTS=ON,-DJOIN_ENABLE_TESTS=OFF"
 
-PACKAGES =+ "${PN}-core"
-PACKAGES =+ "${@bb.utils.contains('PACKAGECONFIG', 'crypto', '${PN}-crypto', '', d)}"
-PACKAGES =+ "${@bb.utils.contains('PACKAGECONFIG', 'data', '${PN}-data', '', d)}"
-PACKAGES =+ "${@bb.utils.contains('PACKAGECONFIG', 'fabric', '${PN}-fabric', '', d)}"
-PACKAGES =+ "${@bb.utils.contains('PACKAGECONFIG', 'services', '${PN}-services', '', d)}"
-
-FILES:${PN}-core = "${libdir}/libjoin-core.so.*"
-FILES:${PN}-crypto = "${libdir}/libjoin-crypto.so.*"
-FILES:${PN}-data = "${libdir}/libjoin-data.so.*"
-FILES:${PN}-fabric = "${libdir}/libjoin-fabric.so.*"
-FILES:${PN}-services = "${libdir}/libjoin-services.so.*"
-
-RDEPENDS:${PN} = "${PN}-core"
-RDEPENDS:${PN} += "${@bb.utils.contains('PACKAGECONFIG', 'crypto', '${PN}-crypto', '', d)}"
-RDEPENDS:${PN} += "${@bb.utils.contains('PACKAGECONFIG', 'data', '${PN}-data', '', d)}"
-RDEPENDS:${PN} += "${@bb.utils.contains('PACKAGECONFIG', 'fabric', '${PN}-fabric', '', d)}"
-RDEPENDS:${PN} += "${@bb.utils.contains('PACKAGECONFIG', 'services', '${PN}-services', '', d)}"
+FILES:${PN} += "${libdir}/*.so.*"
 
 FILES:${PN}-dev = " \
     ${includedir} \
