@@ -44,6 +44,12 @@ IMAGE_INSTALL += "rng-tools"
 # ssh server
 IMAGE_INSTALL += "dropbear"
 
+# networking
+IMAGE_INSTALL += "iproute2"
+
+# rdma
+IMAGE_INSTALL += "rdma-core qperf"
+
 # kernel modules
 IMAGE_INSTALL += "kernel-modules"
 
@@ -55,6 +61,9 @@ FEATURE_PACKAGES_chronos-debug = "chronos-debug"
 
 # make sure libraries needed are added to the SDK
 TOOLCHAIN_TARGET_TASK += "packagegroup-chronos-sdk-target"
+
+# make sure binaries needed are added to the SDK
+TOOLCHAIN_HOST_TASK += "packagegroup-chronos-sdk-host"
 
 # image rootfs size
 IMAGE_ROOTFS_SIZE = "131072"

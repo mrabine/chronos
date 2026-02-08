@@ -35,7 +35,7 @@ SRC_URI += " \
     file://rtc.cfg \
 "
 
-do_add_dts(){
+do_add_dts() {
     mkdir -p ${S}/arch/${ARCH}/boot/dts/chronos/
 
     #cp ${WORKDIR}/<file1>.dts ${S}/arch/${ARCH}/boot/dts/chronos/

@@ -16,7 +16,7 @@ SRC_URI += " \
     file://daemon/getty \
 "
 
-do_install:append(){
+do_install:append() {
     if ${@bb.utils.contains('DISTRO_FEATURES','initng','true','false',d)}; then
         install -d ${D}${initng_daemon_dir}
         install -m 0755 ${WORKDIR}/daemon/mdev ${D}${initng_daemon_dir}/mdev

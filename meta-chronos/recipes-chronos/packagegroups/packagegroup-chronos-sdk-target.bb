@@ -3,7 +3,9 @@ SUMMARY = "chronos target dependencies required in SDK"
 inherit packagegroup
 
 RDEPENDS:${PN} = " \
-    libstdc++-dev libstdc++-staticdev \
-    googletest-staticdev \
+    libstdc++-dev \
+    googletest-dev \
+    capnproto-dev \
     join-dev \
+    rdma-core-dev \
 "

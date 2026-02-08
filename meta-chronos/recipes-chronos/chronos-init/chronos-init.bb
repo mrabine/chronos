@@ -24,7 +24,7 @@ SRC_URI += " \
     file://net/lo \
 "
 
-do_install:append(){
+do_install:append() {
     install -d ${D}${sysconfdir}
     ln -snf ../run/resolv.conf ${D}${sysconfdir}/resolv.conf
     install -m 0644 ${WORKDIR}/modules ${D}${sysconfdir}/modules
@@ -62,7 +62,7 @@ FILES:${PN} += " \
     ${initng_system_dir}/module/* \
 "
 
-pkg_postinst:${PN}:append(){
+pkg_postinst:${PN}:append() {
     if [ -f "$D${sysconfdir}/mdev.conf" ]; then
         echo "" >> "$D${sysconfdir}/mdev.conf"
         echo "eth[0-9].* 0:0 660 @${sysconfdir}/mdev/pci.sh" >> "$D${sysconfdir}/mdev.conf"
