@@ -1,5 +1,5 @@
 SUMMARY = "Unified Communication X"
-DESCRIPTION = "UCX is a communication library implementing high-performance messaging for MPI/PGAS frameworks"
+DESCRIPTION = "UCX is a communication library implementing high-performance messaging"
 LICENSE = "BSD-3-Clause"
 LIC_FILES_CHKSUM = "file://LICENSE;md5=cbe4fe88c540f18985ee4d32d590f683"
 

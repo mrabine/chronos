@@ -1,5 +1,5 @@
 SUMMARY = "Unified Collective Communication"
-DESCRIPTION = "UCC is a collective communication operations API and library that is flexible, complete, and feature-rich for current and emerging programming models and runtimes"
+DESCRIPTION = "UCC is a collective communication operations API and library"
 LICENSE = "BSD-3-Clause"
 LIC_FILES_CHKSUM = "file://LICENSE;md5=0aa687785103f23ae28ca7dca25dc1ff"
 

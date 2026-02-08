@@ -50,6 +50,9 @@ IMAGE_INSTALL += "iproute2"
 # rdma
 IMAGE_INSTALL += "rdma-core qperf"
 
+# ptp
+IMAGE_INSTALL += "linuxptp"
+
 # kernel modules
 IMAGE_INSTALL += "kernel-modules"
 
