@@ -6,6 +6,8 @@ LIC_FILES_CHKSUM = "file://${COREBASE}/meta/COPYING.MIT;md5=3da9cfbcb788c80a0384
 
 RDEPENDS:${PN} += "busybox-mdev"
 
+inherit allarch
+
 SRC_URI += " \
     file://modules \
     file://sysctl.conf \

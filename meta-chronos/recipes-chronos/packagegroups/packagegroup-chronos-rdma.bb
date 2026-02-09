@@ -14,5 +14,6 @@ RDEPENDS:${PN}:append = " \
     ucx \
     ucc \
     iproute2-rdma \
+    rxe-init \
     xpmem-init \
 "

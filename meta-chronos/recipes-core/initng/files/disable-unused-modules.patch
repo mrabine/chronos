@@ -16,3 +16,11 @@ Index: git/src/modules/Jamfile
  SubInclude TOP src modules interactive ;
  SubInclude TOP src modules last ;
  SubInclude TOP src modules limit ;
+@@ -27,7 +25,6 @@ SubInclude TOP src modules ngc4 ;
+ SubInclude TOP src modules nge ;
+ SubInclude TOP src modules pause ;
+ SubInclude TOP src modules provide ;
+-SubInclude TOP src modules reload ;
+ SubInclude TOP src modules renice ;
+ SubInclude TOP src modules runlevel ;
+ SubInclude TOP src modules service ;

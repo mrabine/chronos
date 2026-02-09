@@ -8,6 +8,7 @@ setup() {
         iset need = system/pci
         iset stdall = /dev/null
         iexec start
+        iexec stop
     idone
 }
 
@@ -45,6 +46,35 @@ start() {
     if [ -n "$DNS" ]; then
         echo "nameserver $DNS" > /etc/resolv.conf
     fi
+
+    exit 0
+}
+
+stop() {
+    local line DEVICE GATEWAY
+    line=$(cat /proc/cmdline | tr ' ' '\n' | grep '^ip=')
+
+    if [ -z "$line" ]; then
+        exit 0
+    fi
+
+    DEVICE=$(echo "$line" | cut -d: -f6)
+    GATEWAY=$(echo "$line" | cut -d: -f3)
+
+    if [ -z "$DEVICE" ]; then
+        exit 0
+    fi
+
+    if [ ! -e "/sys/class/net/$DEVICE" ]; then
+        exit 0
+    fi
+
+    if [ -n "$GATEWAY" ]; then
+        ip route del default via "$GATEWAY" dev "$DEVICE" 2>/dev/null || true
+    fi
+
+    ip link set "$DEVICE" down
+    ip addr flush dev "$DEVICE"
 
     exit 0
 }

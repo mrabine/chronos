@@ -1,0 +1,46 @@
+#!/sbin/runiscript
+# SERVICE: system/rxe
+# NAME: rxe
+# DESCRIPTION:
+
+setup() {
+    iregister service
+        iset need = system/cmdline system/module/rdma_rxe
+        iset stdall = /dev/null
+        iexec start
+        iexec stop
+    idone
+}
+
+start() {
+    local line DEVICE
+    line=$(cat /proc/cmdline | tr ' ' '\n' | grep '^ip=')
+
+    if [ -z "$line" ]; then
+        exit 0
+    fi
+
+    DEVICE=$(echo "$line" | cut -d: -f6)
+
+    if [ -z "$DEVICE" ]; then
+        exit 0
+    fi
+
+    if [ ! -e "/sys/class/net/$DEVICE" ]; then
+        exit 0
+    fi
+
+    if ! ip link show "$DEVICE" | grep -q "state UP"; then
+        exit 0
+    fi
+
+    rdma link add rxe0 type rxe netdev "$DEVICE"
+
+    exit 0
+}
+
+stop() {
+    rdma link delete rxe0
+
+    exit 0
+}
