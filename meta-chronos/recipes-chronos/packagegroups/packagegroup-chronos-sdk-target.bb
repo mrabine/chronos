@@ -3,7 +3,7 @@ LICENSE = "MIT"
 
 inherit packagegroup
 
-RDEPENDS:${PN} = " \
+RDEPENDS:${PN}:append = " \
     libstdc++-dev \
     googletest-dev \
     capnproto-dev \

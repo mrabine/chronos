@@ -3,7 +3,7 @@ LICENSE = "MIT"
 
 inherit packagegroup
 
-RDEPENDS:${PN} = "\
+RDEPENDS:${PN}:append = " \
     kernel-module-crc32-generic \
     kernel-module-ip6-udp-tunnel \
     kernel-module-udp-tunnel \
@@ -14,4 +14,5 @@ RDEPENDS:${PN} = "\
     ucx \
     ucc \
     iproute2-rdma \
+    xpmem-init \
 "

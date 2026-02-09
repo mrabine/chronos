@@ -3,7 +3,7 @@ LICENSE = "MIT"
 
 inherit packagegroup
 
-RDEPENDS:${PN} = " \
+RDEPENDS:${PN}:append = " \
     openssh-sftp-server \
     gdbserver \
     binutils \

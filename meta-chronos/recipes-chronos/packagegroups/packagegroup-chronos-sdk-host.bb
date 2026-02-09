@@ -3,6 +3,6 @@ LICENSE = "MIT"
 
 inherit packagegroup
 
-RDEPENDS:${PN} = " \
+RDEPENDS:${PN}:append = " \
     nativesdk-capnproto-compiler \
 "

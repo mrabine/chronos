@@ -1,4 +1,4 @@
-SUMMARY = "XPMEM: Cross-Partition Memory"
+SUMMARY = "XPMEM Cross-Partition Memory"
 DESCRIPTION = "A Linux kernel module that allows a process to map the memory of another process into its own address space."
 LICENSE = "GPL-2.0-only"
 LIC_FILES_CHKSUM = "file://../COPYING;md5=b234ee4d69f5fce4486a80fdaf4a4263"

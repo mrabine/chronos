@@ -15,46 +15,70 @@ setup() {
 start() {
     # check if kernel module support exists
     [ -f /proc/modules ] || exit 0
-    
+
     # check if modules base directory exists
     [ -d "/lib/modules" ] || exit 0
-    
+
     # check if modules directory for current kernel exists
     KERNEL_VERSION=$(uname -r)
     [ -d "/lib/modules/$KERNEL_VERSION" ] || exit 0
-    
-    # check if /etc/modules file exists and is not empty
-    [ -f /etc/modules ] || exit 0
-    [ -s /etc/modules ] || exit 0
-    
-    # load modules using system/module/* services
-    while read -r module args; do
-        case "$module" in
-            ""|\#*) continue ;;
-        esac
-        # start the module service
-        ngc -u system/module/$module start 2>/dev/null
-    done < /etc/modules
-    
+
+    # function to load modules from a file
+    load_modules_from_file() {
+        local file="$1"
+        while read -r module args; do
+            case "$module" in
+                ""|\#*) continue ;;
+            esac
+            # start the module service
+            ngc --start system/module/$module 2>/dev/null
+        done < "$file"
+    }
+
+    # load modules from /etc/modules if it exists
+    if [ -f /etc/modules ] && [ -s /etc/modules ]; then
+        load_modules_from_file /etc/modules
+    fi
+
+    # load modules from /etc/modules-load.d/*.conf files
+    if [ -d /etc/modules-load.d ]; then
+        for conf_file in /etc/modules-load.d/*.conf; do
+            [ -s "$conf_file" ] || continue
+            load_modules_from_file "$conf_file"
+        done
+    fi
+
     exit 0
 }
 
 stop() {
     # check if kernel module support exists
     [ -f /proc/modules ] || exit 0
-    
-    # check if /etc/modules file exists and is not empty
-    [ -f /etc/modules ] || exit 0
-    [ -s /etc/modules ] || exit 0
-    
-    # unload modules in reverse order using system/module/* services
-    tac /etc/modules | while read -r module args; do
-        case "$module" in
-            ""|\#*) continue ;;
-        esac
-        # stop the module service
-        ngc -u system/module/$module stop 2>/dev/null
-    done
-    
+
+    # function to unload modules from a file in reverse order
+    unload_modules_from_file() {
+        local file="$1"
+        tac "$file" | while read -r module args; do
+            case "$module" in
+                ""|\#*) continue ;;
+            esac
+            # stop the module service
+            ngc --stop system/module/$module 2>/dev/null
+        done
+    }
+
+    # unload modules from /etc/modules-load.d/*.conf files (reverse order)
+    if [ -d /etc/modules-load.d ]; then
+        for conf_file in $(ls -r /etc/modules-load.d/*.conf 2>/dev/null); do
+            [ -s "$conf_file" ] || continue
+            unload_modules_from_file "$conf_file"
+        done
+    fi
+
+    # unload modules from /etc/modules if it exists
+    if [ -f /etc/modules ] && [ -s /etc/modules ]; then
+        unload_modules_from_file /etc/modules
+    fi
+
     exit 0
 }
