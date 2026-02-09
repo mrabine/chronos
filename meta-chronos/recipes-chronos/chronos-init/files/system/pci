@@ -5,7 +5,7 @@
 
 RENAME_SCRIPT=/etc/mdev/pci.sh
 
-setup(){
+setup() {
     iregister service
         iset need = system/modules
         iset stdall = /dev/null
@@ -13,7 +13,7 @@ setup(){
     idone
 }
 
-start(){
+start() {
     for iface in /sys/class/net/eth*; do
         [ -e "$iface" ] || continue
         [ -L "$iface/device" ] || continue

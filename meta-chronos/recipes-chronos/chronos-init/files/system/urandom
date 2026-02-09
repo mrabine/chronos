@@ -6,7 +6,7 @@
 RANDOM_SEED=/var/lib/random-seed
 POOL_FILE=/proc/sys/kernel/random/poolsize
 
-setup(){
+setup() {
     iregister service
         iset need = system/modules
         iset stdall = /dev/null
@@ -15,7 +15,7 @@ setup(){
     idone
 }
 
-start(){
+start() {
     local bits bytes seed_dir
 
     seed_dir=$(dirname "$RANDOM_SEED")

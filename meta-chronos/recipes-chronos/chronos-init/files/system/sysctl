@@ -3,14 +3,14 @@
 # NAME: sysctl
 # DESCRIPTION:
 
-setup(){
+setup() {
     iregister service
         iset need = system/hostname
         iexec start
     idone
 }
 
-start(){
+start() {
     if [ -d /etc/sysctl.d ]; then
         for conf in /etc/sysctl.d/*.conf
         do

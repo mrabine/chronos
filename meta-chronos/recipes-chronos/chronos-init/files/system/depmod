@@ -3,7 +3,7 @@
 # NAME: depmod
 # DESCRIPTION:
 
-setup(){
+setup() {
     iregister service
         iset need = system/sysctl
         iset stdall = /dev/null
@@ -11,7 +11,7 @@ setup(){
     idone
 }
 
-start(){
+start() {
     # check if kernel module support exists
     [ -f /proc/modules ] || exit 0
 

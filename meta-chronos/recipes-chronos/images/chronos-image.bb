@@ -48,7 +48,7 @@ IMAGE_INSTALL += "dropbear"
 IMAGE_INSTALL += "iproute2"
 
 # rdma
-IMAGE_INSTALL += "rdma-core iproute2-rdma"
+IMAGE_INSTALL += "packagegroup-chronos-rdma"
 
 # ptp
 IMAGE_INSTALL += "linuxptp"

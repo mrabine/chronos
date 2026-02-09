@@ -3,14 +3,14 @@
 # NAME: mountfs
 # DESCRIPTION:
 
-setup(){
+setup() {
     iregister service
         iexec start
         iexec stop
     idone
 }
 
-start(){
+start() {
     # devtmpfs may already be mounted by kernel
     mount -t devtmpfs devtmpfs /dev 2>/dev/null || true
 
@@ -38,7 +38,7 @@ start(){
     exit 0
 }
 
-stop(){
+stop() {
     # sync disk
     sync
     sleep 2

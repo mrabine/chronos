@@ -3,7 +3,7 @@
 # NAME: cmdline
 # DESCRIPTION:
 
-setup(){
+setup() {
     iregister service
         iset need = system/pci
         iset stdall = /dev/null
@@ -11,7 +11,7 @@ setup(){
     idone
 }
 
-start(){
+start() {
     local line CLIENT_IP GATEWAY NETMASK DEVICE AUTOCONF DNS
     line=$(cat /proc/cmdline | tr ' ' '\n' | grep '^ip=')
 

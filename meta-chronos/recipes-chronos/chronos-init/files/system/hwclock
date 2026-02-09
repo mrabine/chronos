@@ -3,7 +3,7 @@
 # NAME: hwclock
 # DESCRIPTION:
 
-setup(){
+setup() {
     iregister service
         iset need = system/modules
         iset stdall = /dev/null
@@ -12,10 +12,10 @@ setup(){
     idone
 }
 
-start(){
+start() {
     /sbin/hwclock --utc --hctosys
 }
 
-stop(){
+stop() {
     /sbin/hwclock --utc --systohc
 }

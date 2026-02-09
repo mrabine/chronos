@@ -3,13 +3,13 @@
 # NAME: hostname
 # DESCRIPTION:
 
-setup(){
+setup() {
     iregister service
         iset need = system/mountfs
         iexec start
     idone
 }
 
-start(){
+start() {
     hostname -F /etc/hostname
 }

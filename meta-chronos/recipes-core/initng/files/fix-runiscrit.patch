@@ -18,7 +18,7 @@ Index: git/src/modules/service_file/runiscript.c
 +		servname += (strlen(INITNG_ROOT) + 1);
 +	} else {
 +		servname = getenv("SERVICE");
- 	}
+	}
 +	if (servname != NULL)
 +		setenv("SERVICE", servname, 1);
 +	setenv("NAME", initng_string_basename(path), 1);

@@ -3,7 +3,7 @@
 # NAME: essentials
 # DESCRIPTION:
 
-setup(){
+setup() {
     iregister virtual
         iset need = system/sysctl system/depmod system/modules system/hostname system/hwclock daemon/mdev daemon/rngd daemon/syslogd
     idone
