@@ -21,10 +21,10 @@ SRC_URI += " \
     file://disable-unused-modules.patch \
     file://fix-broken-build.patch \
     file://fix-ngcclient.patch \
-    file://fix-runiscrit.patch \
     file://fix-runlevel.patch \
     file://sanitize-stdio.patch \
     file://fix-fmon.patch \
+    file://fix-any.patch \
     file://default \
 "
 

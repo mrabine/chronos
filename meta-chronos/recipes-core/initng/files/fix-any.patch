@@ -1,0 +1,73 @@
+Index: git/src/modules/service_file/initng_service_file.c
+===================================================================
+--- git.orig/src/modules/service_file/initng_service_file.c
++++ git/src/modules/service_file/initng_service_file.c
+@@ -795,7 +795,7 @@ static void create_new_active(s_event *
+ 			return;
+ 	}
+ 
+-	file = malloc(sizeof(INITNG_ROOT) + sizeof("/this") + strlen(name) + 2);
++	file = malloc(sizeof(INITNG_ROOT) + 1 + strlen(name) + sizeof("/this") + 1);
+ 
+ 	/*
+ 	 * scheme: "daemon/samba/smbd"
+@@ -816,7 +816,7 @@ static void create_new_active(s_event *
+ 			r[0] = '\0';
+ 
+ 			/* Add "any" */
+-			strcat(file, "/any");
++			strcat(r, "/any");
+ 			found = parse_new_service_file(event, file);
+ 		}
+ 	}
+Index: git/src/modules/service_file/runiscript.c
+===================================================================
+--- git.orig/src/modules/service_file/runiscript.c
++++ git/src/modules/service_file/runiscript.c
+@@ -98,6 +98,7 @@ int main(int argc, char *argv[])
+ 	if (argv[1][0] == '/') {
+ 		/* a full path, this is really good */
+ 		strncpy(path, argv[1], 1024);
++		path[1024] = 0;
+ 	} else if (argv[1][0] == '.') {
+ 		/* replace starting '.' with full path to local cwd */
+ 		if (!getcwd(path, 1024)) {
+@@ -119,13 +120,17 @@ int main(int argc, char *argv[])
+ 		return 2;
+ 	}
+ 
+-	/* FIXME: Should we use $SERVICE to detect when to realay the command to ngc? */
+-	/*        We should never set this by ourselves... */
+ 	servname = getenv("SERVICE");
+-	if (!servname) {
+-		servname = (char *)initng_string_basename(path);
+-		setenv("SERVICE", servname, 1);
+-		setenv("NAME", servname, 1);
++	if (servname == NULL) {
++		servname = (char *)strstr(path, INITNG_ROOT);
++		if (servname != NULL && strlen(servname) > (strlen(INITNG_ROOT) + 1)) {
++			servname += (strlen(INITNG_ROOT) + 1);
++			setenv("SERVICE", servname, 1);
++		}
++	}
++
++	if (getenv("NAME") == NULL && servname != NULL) {
++		setenv("NAME", initng_string_basename(path), 1);
+ 	}
+ 
+ 	/* check if command shud forward to a ngc command */
+Index: git/src/modules/simple_launcher/initng_simple_launcher.c
+===================================================================
+--- git.orig/src/modules/simple_launcher/initng_simple_launcher.c
++++ git/src/modules/simple_launcher/initng_simple_launcher.c
+@@ -327,10 +327,6 @@ static int simple_run(active_db_h * serv
+ 	initng_string_split_delim_free(argv);
+ 	argv = NULL;
+ 
+-	/* return result */
+-	if (result == FAIL)
+-		return FALSE;
+-
+ 	return result;
+ }
+ 
