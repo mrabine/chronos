@@ -1,0 +1,22 @@
+name: cd
+
+on:
+  push:
+    branches: [ main ]
+
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    uses: ./.github/workflows/build.yml
+
+    permissions:
+      contents: read
+
+    with:
+      release: true
+      sdk: true
