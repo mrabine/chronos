@@ -1,0 +1,24 @@
+name: cache
+
+on:
+  schedule:
+    - cron: "0 13 * * 0"
+
+  workflow_dispatch:
+
+jobs:
+  cache:
+    uses: ./.github/workflows/build.yml
+
+    permissions:
+      contents: read
+
+    secrets:
+      YOCTOCACHE_KNOWN_HOST: ${{ secrets.YOCTOCACHE_KNOWN_HOST }}
+      YOCTOCACHE_DEPLOY_KEY: ${{ secrets.YOCTOCACHE_DEPLOY_KEY }}
+      YOCTOCACHE_PORT: ${{ secrets.YOCTOCACHE_PORT }}
+      YOCTOCACHE_DEST: ${{ secrets.YOCTOCACHE_DEST }}
+
+    with:
+      cache: true
+      sdk: true

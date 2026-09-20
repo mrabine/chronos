@@ -23,8 +23,8 @@ BB_HASHSERVE = ""
 # cache
 INHERIT += "own-mirrors"
 BB_GENERATE_MIRROR_TARBALLS = "1"
-SOURCE_MIRROR_URL ?= "https://yocto.dorale.fr/source-mirror/"
-SSTATE_MIRRORS ?= "file://.* https://yocto.dorale.fr/sstate-mirror/${MACHINE}/PATH;downloadfilename=PATH"
+SOURCE_MIRROR_URL ?= "https://yocto.joinframework.net/source-mirror/"
+SSTATE_MIRRORS ?= "file://.* https://yocto.joinframework.net/sstate-mirror/${MACHINE}/PATH;downloadfilename=PATH"
 
 # users
 USERADDEXTENSION = "useradd-staticids"

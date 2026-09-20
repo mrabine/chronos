@@ -1,0 +1,175 @@
+name: build
+
+on:
+  workflow_call:
+    inputs:
+      machine:
+        type: string
+        default: 'all'
+      release:
+        type: boolean
+        default: false
+      cache:
+        type: boolean
+        default: false
+      sdk:
+        type: boolean
+        default: false
+      dry_run:
+        type: boolean
+        default: false
+
+    secrets:
+      YOCTOCACHE_KNOWN_HOST:
+        required: false
+      YOCTOCACHE_DEPLOY_KEY:
+        required: false
+      YOCTOCACHE_DEST:
+        required: false
+      YOCTOCACHE_PORT:
+        required: false
+
+  workflow_dispatch:
+    inputs:
+      machine:
+        type: choice
+        options:
+          - all
+          - daytona
+          - tank
+        default: 'all'
+      release:
+        type: boolean
+        default: false
+      cache:
+        type: boolean
+        default: false
+      sdk:
+        type: boolean
+        default: false
+      dry_run:
+        type: boolean
+        default: false
+
+jobs:
+  image:
+    runs-on: ubuntu-latest
+
+    container:
+      image: joinframework/chronos-ci:latest
+      options: --privileged --user root --sysctl net.ipv6.conf.all.disable_ipv6=0
+
+    strategy:
+      fail-fast: false
+      matrix:
+        machine: ${{ inputs.machine == 'all' && fromJson('["daytona", "tank"]') || fromJson(format('["{0}"]', inputs.machine)) }}
+
+    defaults:
+      run:
+        shell: setpriv --reuid=chronos --regid=chronos --init-groups env HOME=/home/chronos bash --noprofile --norc -eo pipefail {0}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+        with:
+          submodules: recursive
+
+      - name: Set Workspace Ownership
+        shell: bash
+        run: chown -R chronos:chronos "$GITHUB_WORKSPACE"
+
+      - name: Setup Build Environment
+        run: |
+          source ./meta-chronos-distro/chronos-init-build-env
+          if [ "${{ inputs.release }}" = "true" ]; then
+            echo "EXTRA_IMAGE_FEATURES:remove = \"debug-tweaks chronos-debug\"" >> conf/local.conf
+          fi
+
+      - name: Build Image
+        run: |
+          source ./meta-chronos-distro/chronos-init-build-env
+          MACHINE=${{ matrix.machine }} bitbake --quiet chronos-image
+
+      # - name: Run Test Image
+      #   run: |
+      #     source ./meta-chronos-distro/chronos-init-build-env
+      #     MACHINE=${{ matrix.machine }} bitbake chronos-image:do_testimage
+
+      - name: Build SDK
+        if: inputs.sdk
+        run: |
+          source ./meta-chronos-distro/chronos-init-build-env
+          MACHINE=${{ matrix.machine }} bitbake --quiet chronos-image:do_populate_sdk
+
+      - name: Setup Sync
+        if: inputs.cache
+        env:
+          KNOWN_HOST: ${{ secrets.YOCTOCACHE_KNOWN_HOST }}
+          DEPLOY_KEY: ${{ secrets.YOCTOCACHE_DEPLOY_KEY }}
+        run: |
+          mkdir -p "$HOME/.ssh"
+          chmod 700 "$HOME/.ssh"
+          printf '%s\n' "$KNOWN_HOST" >> "$HOME/.ssh/known_hosts"
+          printf '%s\n' "$DEPLOY_KEY" > "$HOME/.ssh/id_deploy"
+          chmod 600 "$HOME/.ssh/known_hosts" "$HOME/.ssh/id_deploy"
+
+      - name: Sync Sources
+        if: inputs.cache
+        env:
+          DEST: ${{ secrets.YOCTOCACHE_DEST }}
+          PORT: ${{ secrets.YOCTOCACHE_PORT }}
+        run: |
+          cd build/downloads
+          rsync -rlptD --quiet --mkpath ${{ inputs.dry_run && '--dry-run --stats' || '' }} \
+            --partial-dir=.rsync-partial-${{ matrix.machine }} \
+            --include='/uninative/***' \
+            --exclude='/*/' \
+            --exclude='*.tmp' \
+            --exclude='*.lock' \
+            --exclude='*.done' \
+            -e "ssh -p $PORT -i $HOME/.ssh/id_deploy -o IdentitiesOnly=yes -o UserKnownHostsFile=$HOME/.ssh/known_hosts -o StrictHostKeyChecking=yes" \
+              ./ "$DEST/source-mirror/"
+
+      - name: Sync Cache
+        if: inputs.cache
+        env:
+          DEST: ${{ secrets.YOCTOCACHE_DEST }}
+          PORT: ${{ secrets.YOCTOCACHE_PORT }}
+        run: |
+          cd build/sstate-cache
+          rsync -rlptD --quiet --mkpath ${{ inputs.dry_run && '--dry-run --stats' || '' }} --delete --delete-after \
+            --partial-dir=.rsync-partial \
+            --exclude='/.rsync-partial/' \
+            -e "ssh -p $PORT -i $HOME/.ssh/id_deploy -o IdentitiesOnly=yes -o UserKnownHostsFile=$HOME/.ssh/known_hosts -o StrictHostKeyChecking=yes" \
+              ./ "$DEST/sstate-mirror/${{ matrix.machine }}/"
+
+      - name: Collect Artifacts
+        if: inputs.release
+        run: |
+          mkdir -p artifacts/${{ matrix.machine }}
+          cp build/tmp/deploy/images/${{ matrix.machine }}/*.rootfs.ext4.gz artifacts/${{ matrix.machine }}/
+          if [ -f "build/tmp/deploy/images/${{ matrix.machine }}/bzImage" ]; then
+            cp "build/tmp/deploy/images/${{ matrix.machine }}/bzImage" "artifacts/${{ matrix.machine }}/"
+          else
+            cp "build/tmp/deploy/images/${{ matrix.machine }}/Image.gz" "artifacts/${{ matrix.machine }}/"
+          fi
+          if [ "${{ inputs.sdk }}" = "true" ]; then
+            cp build/tmp/deploy/sdk/*.sh artifacts/${{ matrix.machine }}/
+          fi
+
+      - name: Upload Artifacts to GitHub
+        if: inputs.release
+        uses: actions/upload-artifact@v7
+        with:
+          name: ${{ matrix.machine }}-artifacts
+          path: artifacts/${{ matrix.machine }}/
+          if-no-files-found: error
+
+      - name: Cleanup Workspace
+        if: always()
+        run: |
+          rm -rf -- "$GITHUB_WORKSPACE"/*
+          rm -rf -- "$GITHUB_WORKSPACE"/.[!.]* "$GITHUB_WORKSPACE"/..?*
+          if [ "${{ inputs.cache }}" = "true" ]; then
+            shred -u "$HOME/.ssh/id_deploy" 2>/dev/null || rm -f "$HOME/.ssh/id_deploy"
+          fi
