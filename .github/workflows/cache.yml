@@ -16,8 +16,8 @@ jobs:
     secrets:
       YOCTOCACHE_KNOWN_HOST: ${{ secrets.YOCTOCACHE_KNOWN_HOST }}
       YOCTOCACHE_DEPLOY_KEY: ${{ secrets.YOCTOCACHE_DEPLOY_KEY }}
-      YOCTOCACHE_PORT: ${{ secrets.YOCTOCACHE_PORT }}
       YOCTOCACHE_DEST: ${{ secrets.YOCTOCACHE_DEST }}
+      YOCTOCACHE_PORT: ${{ secrets.YOCTOCACHE_PORT }}
 
     with:
       cache: true
