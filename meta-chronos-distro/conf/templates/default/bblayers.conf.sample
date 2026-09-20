@@ -12,6 +12,8 @@ BBLAYERS ?= " \
   ##OEROOT##/../meta-openembedded/meta-python \
   ##OEROOT##/../meta-openembedded/meta-networking \
   ##OEROOT##/../meta-openembedded/meta-filesystems \
+  ##OEROOT##/../meta-clang \
+  ##OEROOT##/../meta-dpdk \
   ##OEROOT##/../meta-chronos-bsp \
   ##OEROOT##/../meta-chronos-distro \
   ##OEROOT##/../meta-chronos \

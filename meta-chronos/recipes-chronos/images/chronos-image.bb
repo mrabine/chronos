@@ -53,6 +53,9 @@ IMAGE_INSTALL += "packagegroup-chronos-rdma"
 # ptp
 IMAGE_INSTALL += "linuxptp"
 
+# join framework
+IMAGE_INSTALL += "join"
+
 # package management
 IMAGE_FEATURES += "package-management"
 
