@@ -66,7 +66,7 @@ jobs:
 
     defaults:
       run:
-        shell: setpriv --reuid=chronos --regid=chronos --init-groups env HOME=/home/chronos bash --noprofile --norc -eo pipefail {0}
+        shell: setpriv --reuid=chronos --regid=chronos --init-groups --inh-caps=+sys_admin --ambient-caps=+sys_admin env HOME=/home/chronos bash --noprofile --norc -eo pipefail {0}
 
     steps:
       - name: Checkout
