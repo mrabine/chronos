@@ -6,3 +6,11 @@
 	path = meta-openembedded
 	url = https://github.com/openembedded/meta-openembedded.git
 	branch = scarthgap
+[submodule "meta-dpdk"]
+	path = meta-dpdk
+	url = https://git.yoctoproject.org/meta-dpdk
+	branch = scarthgap
+[submodule "meta-clang"]
+	path = meta-clang
+	url = https://github.com/kraj/meta-clang
+	branch = scarthgap

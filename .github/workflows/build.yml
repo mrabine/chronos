@@ -93,10 +93,10 @@ jobs:
           source ./meta-chronos-distro/chronos-init-build-env
           MACHINE=${{ matrix.machine }} bitbake --quiet chronos-image
 
-      # - name: Run Test Image
-      #   run: |
-      #     source ./meta-chronos-distro/chronos-init-build-env
-      #     MACHINE=${{ matrix.machine }} bitbake chronos-image:do_testimage
+      - name: Run Test Image
+        run: |
+          source ./meta-chronos-distro/chronos-init-build-env
+          MACHINE=${{ matrix.machine }} bitbake chronos-image:do_testimage
 
       - name: Build SDK
         if: inputs.sdk
