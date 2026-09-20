@@ -94,6 +94,7 @@ jobs:
           MACHINE=${{ matrix.machine }} bitbake --quiet chronos-image
 
       - name: Run Test Image
+        if: ${{ !inputs.release }}
         run: |
           source ./meta-chronos-distro/chronos-init-build-env
           MACHINE=${{ matrix.machine }} bitbake chronos-image:do_testimage
