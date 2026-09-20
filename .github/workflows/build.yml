@@ -94,18 +94,19 @@ jobs:
           MACHINE=${{ matrix.machine }} bitbake --quiet chronos-image
 
       - name: Run Test Image
+        if: ${{ !inputs.release }}
         run: |
           source ./meta-chronos-distro/chronos-init-build-env
           MACHINE=${{ matrix.machine }} bitbake chronos-image:do_testimage
 
       - name: Build SDK
-        if: inputs.sdk
+        if: ${{ inputs.sdk }}
         run: |
           source ./meta-chronos-distro/chronos-init-build-env
           MACHINE=${{ matrix.machine }} bitbake --quiet chronos-image:do_populate_sdk
 
       - name: Setup Sync
-        if: inputs.cache
+        if: ${{ inputs.cache }}
         env:
           KNOWN_HOST: ${{ secrets.YOCTOCACHE_KNOWN_HOST }}
           DEPLOY_KEY: ${{ secrets.YOCTOCACHE_DEPLOY_KEY }}
@@ -117,7 +118,7 @@ jobs:
           chmod 600 "$HOME/.ssh/known_hosts" "$HOME/.ssh/id_deploy"
 
       - name: Sync Sources
-        if: inputs.cache
+        if: ${{ inputs.cache }}
         env:
           DEST: ${{ secrets.YOCTOCACHE_DEST }}
           PORT: ${{ secrets.YOCTOCACHE_PORT }}
@@ -134,7 +135,7 @@ jobs:
               ./ "$DEST/source-mirror/"
 
       - name: Sync Cache
-        if: inputs.cache
+        if: ${{ inputs.cache }}
         env:
           DEST: ${{ secrets.YOCTOCACHE_DEST }}
           PORT: ${{ secrets.YOCTOCACHE_PORT }}
@@ -147,7 +148,7 @@ jobs:
               ./ "$DEST/sstate-mirror/${{ matrix.machine }}/"
 
       - name: Collect Artifacts
-        if: inputs.release
+        if: ${{ inputs.release }}
         run: |
           mkdir -p artifacts/${{ matrix.machine }}
           cp build/tmp/deploy/images/${{ matrix.machine }}/*.rootfs.ext4.gz artifacts/${{ matrix.machine }}/
@@ -161,7 +162,7 @@ jobs:
           fi
 
       - name: Upload Artifacts to GitHub
-        if: inputs.release
+        if: ${{ inputs.release }}
         uses: actions/upload-artifact@v7.0.1
         with:
           name: ${{ matrix.machine }}-artifacts
@@ -169,7 +170,7 @@ jobs:
           if-no-files-found: error
 
       - name: Cleanup Workspace
-        if: always()
+        if: ${{ always() }}
         run: |
           rm -rf -- "$GITHUB_WORKSPACE"/*
           rm -rf -- "$GITHUB_WORKSPACE"/.[!.]* "$GITHUB_WORKSPACE"/..?*
