@@ -20,5 +20,5 @@ jobs:
       YOCTOCACHE_PORT: ${{ secrets.YOCTOCACHE_PORT }}
 
     with:
-      cache: true
       sdk: true
+      cache: true
