@@ -9,10 +9,10 @@ on:
       release:
         type: boolean
         default: false
-      cache:
+      sdk:
         type: boolean
         default: false
-      sdk:
+      cache:
         type: boolean
         default: false
       dry_run:
@@ -41,10 +41,10 @@ on:
       release:
         type: boolean
         default: false
-      cache:
+      sdk:
         type: boolean
         default: false
-      sdk:
+      cache:
         type: boolean
         default: false
       dry_run:
@@ -147,27 +147,27 @@ jobs:
             -e "ssh -p $PORT -i $HOME/.ssh/id_deploy -o IdentitiesOnly=yes -o UserKnownHostsFile=$HOME/.ssh/known_hosts -o StrictHostKeyChecking=yes" \
               ./ "$DEST/sstate-mirror/${{ matrix.machine }}/"
 
-      - name: Collect Artifacts
-        if: ${{ inputs.release }}
-        run: |
-          mkdir -p artifacts/${{ matrix.machine }}
-          cp build/tmp/deploy/images/${{ matrix.machine }}/*.rootfs.ext4.gz artifacts/${{ matrix.machine }}/
-          if [ -f "build/tmp/deploy/images/${{ matrix.machine }}/bzImage" ]; then
-            cp "build/tmp/deploy/images/${{ matrix.machine }}/bzImage" "artifacts/${{ matrix.machine }}/"
-          else
-            cp "build/tmp/deploy/images/${{ matrix.machine }}/Image.gz" "artifacts/${{ matrix.machine }}/"
-          fi
-          if [ "${{ inputs.sdk }}" = "true" ]; then
-            cp build/tmp/deploy/sdk/*.sh artifacts/${{ matrix.machine }}/
-          fi
-
       - name: Upload Artifacts to GitHub
         if: ${{ inputs.release }}
         uses: actions/upload-artifact@v7.0.1
         with:
-          name: ${{ matrix.machine }}-artifacts
-          path: artifacts/${{ matrix.machine }}/
-          if-no-files-found: error
+          name: build-${{ matrix.machine }}
+          path: |
+            build/tmp/deploy/images/${{ matrix.machine }}/*.rootfs.ext4.gz
+            build/tmp/deploy/images/${{ matrix.machine }}/bzImage
+            build/tmp/deploy/images/${{ matrix.machine }}/Image.gz
+            ${{ inputs.sdk && format('build/tmp/deploy/sdk/*.sh') || '' }}
+          if-no-files-found: ignore
+
+      - name: Upload Logs to GitHub
+        if: ${{ failure() }}
+        uses: actions/upload-artifact@v7.0.1
+        with:
+          name: logs-${{ matrix.machine }}
+          path: |
+            build/conf/local.conf
+            build/tmp*/work/*/*/*/temp/log.do_*
+          if-no-files-found: ignore
 
       - name: Cleanup Workspace
         if: ${{ always() }}
